@@ -1,623 +1,426 @@
-* {
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f6fa;
-    color: #182033;
-}
-
-
-/* =========================
-   HEADER
-========================= */
-
-.site-header {
-    background: white;
-    border-bottom: 1px solid #ddd;
-    padding: 15px 20px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.site-header h1 {
-    margin: 0;
-    font-size: 23px;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-}
+<!DOCTYPE html>
 
-
-/* =========================
-   NAVIGATION
-========================= */
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-.main-nav {
-    display: flex;
-    gap: 7px;
-    flex-wrap: wrap;
-    align-items: center;
-}
+```
+<title>Accueil</title>
 
-button {
-    border: 0;
-    border-radius: 9px;
-    padding: 10px 14px;
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    background: #315bd6;
-    color: white;
+<!-- Style du site -->
+<link rel="stylesheet" href="style.css">
+```
 
-    font-weight: bold;
-    cursor: pointer;
+</head>
 
-    transition:
-        transform .15s,
-        opacity .15s,
-        box-shadow .15s;
-}
+<body>
 
-button:hover {
-    opacity: .92;
-    transform: translateY(-1px);
-}
+<header class="site-header">
 
-button:active {
-    transform: translateY(0);
-}
+```
+<div class="header-left">
+    <h1 id="siteTitle">Accueil</h1>
+</div>
 
-button.secondary {
-    background: #e8ecf4;
-    color: #182033;
-}
+<nav class="main-nav">
 
-button.danger {
-    background: #d9363e;
-}
+    <button
+        class="nav-button secondary"
+        onclick="showHome()">
+        Accueil
+    </button>
 
-button:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
+    <button
+        class="nav-button secondary"
+        onclick="showLearn()">
+        Apprendre
+    </button>
 
+    <button
+        class="nav-button secondary"
+        onclick="showLogin()">
+        Se connecter
+    </button>
 
-/* =========================
-   CONTENU
-========================= */
+    <span id="adminButton"></span>
 
-main {
-    width: 100%;
-    max-width: 1100px;
+</nav>
+```
 
-    margin: 25px auto;
-    padding: 0 16px;
-}
+</header>
 
-.card {
-    background: white;
-    border-radius: 17px;
+<main>
 
-    padding: 22px;
-    margin-bottom: 18px;
+```
+<!-- =========================
+     ACCUEIL
+========================== -->
 
-    box-shadow: 0 4px 18px #0001;
-}
+<section id="home">
 
-.hidden {
-    display: none !important;
-}
+    <div class="card">
 
-.muted {
-    color: #687386;
-}
+        <h2>Accueil</h2>
 
-.center {
-    text-align: center;
-}
+        <p class="muted">
+            Explore les matières, les dossiers,
+            les mémos et les exercices.
+        </p>
 
+        <div id="homeExplorer">
+            <div class="notice">
+                Chargement...
+            </div>
+        </div>
 
-/* =========================
-   BARRE D'OUTILS
-========================= */
+    </div>
 
-.toolbar {
-    display: flex;
-    gap: 8px;
+</section>
 
-    flex-wrap: wrap;
 
-    margin-bottom: 18px;
-}
+<!-- =========================
+     APPRENDRE
+========================== -->
 
+<section id="learn" class="hidden">
 
-/* =========================
-   FIL D'ARIANE
-========================= */
+    <div class="card">
 
-.breadcrumb {
-    display: flex;
-    align-items: center;
+        <h2>Apprendre</h2>
 
-    gap: 6px;
-    flex-wrap: wrap;
+        <p class="muted">
+            Crée et organise les matières
+            et les ressources.
+        </p>
 
-    margin-bottom: 18px;
-}
+        <div id="learnExplorer">
+            <div class="notice">
+                Chargement...
+            </div>
+        </div>
 
-.breadcrumb button {
-    background: transparent;
-    color: #315bd6;
+    </div>
 
-    padding: 3px;
-}
+</section>
 
-.breadcrumb span {
-    color: #8993a5;
-}
 
+<!-- =========================
+     CONNEXION
+========================== -->
 
-/* =========================
-   EXPLORATEUR
-========================= */
+<section id="login" class="hidden">
 
-.file-grid {
-    display: grid;
+    <div class="card login-card">
 
-    grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(190px, 1fr)
-        );
+        <h2>Se connecter</h2>
 
-    gap: 15px;
-}
+        <p class="muted">
+            Connecte-toi pour accéder
+            à l'administration.
+        </p>
 
-.file {
-    background: #fafbfe;
+        <label for="firstName">
+            Prénom
+        </label>
 
-    border: 1px solid #dbe1eb;
-    border-radius: 14px;
+        <input
+            id="firstName"
+            type="text"
+            autocomplete="given-name"
+        >
 
-    padding: 17px;
+        <label for="lastName">
+            Nom de famille
+        </label>
 
-    min-height: 135px;
+        <input
+            id="lastName"
+            type="text"
+            autocomplete="family-name"
+        >
 
-    cursor: pointer;
+        <button onclick="login()">
+            Se connecter
+        </button>
 
-    transition:
-        transform .15s,
-        box-shadow .15s,
-        background .15s;
-}
+        <p id="loginMessage"></p>
 
-.file:hover {
-    transform: translateY(-2px);
+    </div>
 
-    box-shadow:
-        0 5px 15px #0001;
+</section>
 
-    background: white;
-}
 
-.icon {
-    font-size: 36px;
-    margin-bottom: 10px;
-}
+<!-- =========================
+     ADMINISTRATION
+========================== -->
 
-.file-title {
-    font-weight: bold;
+<section id="admin" class="hidden">
 
-    word-break: break-word;
+    <div class="card">
 
-    line-height: 1.4;
-}
+        <div class="toolbar">
 
+            <button onclick="newItem(currentFolder)">
+                + Nouveau fichier
+            </button>
 
-/* =========================
-   ADMINISTRATION
-========================= */
+            <button
+                class="secondary"
+                onclick="logout()">
+                Déconnexion
+            </button>
 
-.admin-item {
-    border: 1px solid #d7deea;
+        </div>
 
-    border-left:
-        7px solid var(--color);
+        <div id="adminExplorer">
 
-    border-radius: 12px;
+            <div class="notice">
+                Chargement...
+            </div>
 
-    padding: 14px;
-    margin: 10px 0;
+        </div>
 
-    background: #fafbfe;
+    </div>
 
-    transition:
-        box-shadow .15s,
-        transform .15s;
-}
 
-.admin-item:hover {
-    box-shadow: 0 4px 12px #0001;
-    transform: translateY(-1px);
-}
+    <!-- =========================
+         EDITEUR
+    ========================== -->
 
-.admin-item b {
-    display: block;
+    <div id="editor" class="card hidden">
 
-    font-size: 16px;
+        <h2 id="editorTitle">
+            Nouveau fichier
+        </h2>
 
-    word-break: break-word;
-}
+        <input
+            type="hidden"
+            id="editId"
+        >
 
-.actions {
-    display: flex;
+        <input
+            type="hidden"
+            id="editParent"
+        >
 
-    gap: 6px;
-    flex-wrap: wrap;
 
-    margin-top: 10px;
-}
+        <div class="grid">
 
+            <div>
 
-/* =========================
-   FORMULAIRES
-========================= */
+                <label for="itemName">
+                    Nom
+                </label>
 
-input,
-textarea,
-select {
-    width: 100%;
+                <input
+                    id="itemName"
+                    placeholder="Nom du fichier ou dossier"
+                >
 
-    padding: 11px;
 
-    border:
-        1px solid #ccd3df;
+                <label for="itemType">
+                    Type
+                </label>
 
-    border-radius: 9px;
+                <select
+                    id="itemType"
+                    onchange="changeType()">
 
-    font: inherit;
+                    <option value="folder">
+                        📁 Dossier
+                    </option>
 
-    margin:
-        6px 0 15px;
+                    <option value="memo">
+                        📄 Mémo
+                    </option>
 
-    background: white;
+                    <option value="exercise">
+                        📝 Exercice
+                    </option>
 
-    color: #182033;
+                </select>
 
-    outline: none;
 
-    transition:
-        border-color .15s,
-        box-shadow .15s;
-}
+                <label for="itemColor">
+                    Couleur
+                </label>
 
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: #315bd6;
+                <input
+                    id="itemColor"
+                    type="color"
+                    value="#315bd6"
+                    oninput="updateColor()"
+                >
 
-    box-shadow:
-        0 0 0 3px #315bd620;
-}
+                <div
+                    id="colorPreview"
+                    class="color-preview">
+                </div>
 
-textarea {
-    min-height: 100px;
-    resize: vertical;
-}
+            </div>
 
-label {
-    display: block;
 
-    font-weight: bold;
+            <!-- =========================
+                 MEMO
+            ========================== -->
 
-    margin-top: 7px;
-    margin-bottom: 3px;
-}
+            <div id="memoFields">
 
+                <label for="itemText">
+                    Texte
+                </label>
 
-/* =========================
-   GRILLE EDITEUR
-========================= */
+                <textarea
+                    id="itemText"
+                    placeholder="Écris ton mémo...">
+                </textarea>
 
-.grid {
-    display: grid;
 
-    grid-template-columns:
-        1fr 1fr;
+                <label for="itemImageUrl">
+                    Lien vers une image
+                </label>
 
-    gap: 20px;
-}
+                <input
+                    id="itemImageUrl"
+                    placeholder="https://..."
+                >
 
 
-/* =========================
-   COULEUR
-========================= */
+                <label for="itemImageFile">
+                    Image
+                </label>
 
-.color-preview {
-    height: 35px;
+                <input
+                    id="itemImageFile"
+                    type="file"
+                    accept="image/*"
+                >
 
-    border-radius: 9px;
 
-    margin-bottom: 15px;
+                <label for="itemAudioUrl">
+                    Lien vers un son
+                </label>
 
-    background: #315bd6;
+                <input
+                    id="itemAudioUrl"
+                    placeholder="https://..."
+                >
 
-    border:
-        1px solid #dbe1eb;
-}
 
+                <label for="itemAudioFile">
+                    Son / MP3
+                </label>
 
-/* =========================
-   MEMOS
-========================= */
+                <input
+                    id="itemAudioFile"
+                    type="file"
+                    accept="audio/*"
+                >
 
-.memo {
-    line-height: 1.7;
+            </div>
 
-    white-space: pre-wrap;
+        </div>
 
-    overflow-wrap: anywhere;
-}
 
-.memo img {
-    display: block;
+        <!-- =========================
+             EXERCICE
+        ========================== -->
 
-    max-width: 100%;
-    max-height: 450px;
+        <div
+            id="exerciseFields"
+            class="hidden">
 
-    border-radius: 12px;
+            <label for="question">
+                Question
+            </label>
 
-    margin-top: 15px;
-}
+            <textarea
+                id="question"
+                placeholder="Écris la question...">
+            </textarea>
 
-audio {
-    width: 100%;
 
-    margin-top: 15px;
-}
+            <label for="answer">
+                Réponse attendue
+            </label>
 
+            <input
+                id="answer"
+                placeholder="Réponse"
+            >
 
-/* =========================
-   EXERCICES
-========================= */
+        </div>
 
-.exercise {
-    background: #eef3ff;
 
-    border-radius: 12px;
+        <div class="toolbar">
 
-    padding: 17px;
+            <button onclick="saveItem()">
+                Enregistrer
+            </button>
 
-    margin-top: 18px;
-}
+            <button
+                class="secondary"
+                onclick="closeEditor()">
+                Annuler
+            </button>
 
-.exercise strong {
-    display: block;
+        </div>
 
-    margin-bottom: 10px;
-}
+    </div>
 
-.result {
-    margin-top: 10px;
 
-    padding: 9px;
+    <!-- =========================
+         SAUVEGARDE
+    ========================== -->
 
-    border-radius: 8px;
-}
+    <div class="card">
 
-.ok {
-    background: #e8f7ed;
+        <h3>Sauvegarde</h3>
 
-    color: #176b38;
-}
+        <p class="muted">
+            Les données principales sont enregistrées
+            en ligne avec Supabase.
+        </p>
 
-.no {
-    background: #ffe8eb;
+        <div class="toolbar">
 
-    color: #a51d2d;
-}
+            <button
+                class="secondary"
+                onclick="exportData()">
+                Exporter
+            </button>
 
+            <button
+                class="secondary"
+                onclick="document.getElementById('importFile').click()">
+                Importer
+            </button>
 
-/* =========================
-   NOTIFICATIONS
-========================= */
+        </div>
 
-.notice {
-    background: #f0f3f8;
 
-    padding: 13px;
+        <input
+            id="importFile"
+            class="hidden"
+            type="file"
+            accept=".json"
+            onchange="importData(event)"
+        >
 
-    border-radius: 10px;
+    </div>
 
-    color: #687386;
-}
+</section>
+```
 
-#loginMessage {
-    margin-top: 12px;
-}
+</main>
 
-#loginMessage.no {
-    background: #ffe8eb;
+<!-- JavaScript du site -->
 
-    color: #a51d2d;
+<script src="app.js"></script>
 
-    padding: 10px;
-
-    border-radius: 8px;
-}
-
-#loginMessage.ok {
-    background: #e8f7ed;
-
-    color: #176b38;
-
-    padding: 10px;
-
-    border-radius: 8px;
-}
-
-
-/* =========================
-   CHARGEMENT
-========================= */
-
-.loading {
-    text-align: center;
-
-    padding: 30px;
-
-    color: #687386;
-}
-
-
-/* =========================
-   LIENS / IMAGES
-========================= */
-
-img {
-    max-width: 100%;
-}
-
-a {
-    color: #315bd6;
-}
-
-
-/* =========================
-   CONNEXION
-========================= */
-
-.login-card {
-    max-width: 500px;
-
-    margin-left: auto;
-    margin-right: auto;
-}
-
-
-/* =========================
-   PETITS ECRANS
-========================= */
-
-@media (max-width: 700px) {
-
-    .site-header {
-        flex-direction: column;
-
-        align-items: stretch;
-
-        padding: 13px 15px;
-    }
-
-    .header-left {
-        justify-content: center;
-    }
-
-    .site-header h1 {
-        font-size: 21px;
-    }
-
-    .main-nav {
-        justify-content: center;
-    }
-
-    .main-nav button {
-        flex: 1;
-
-        min-width: 100px;
-    }
-
-    main {
-        margin-top: 18px;
-
-        padding:
-            0 10px;
-    }
-
-    .card {
-        padding: 17px;
-
-        border-radius: 14px;
-    }
-
-    .grid {
-        grid-template-columns: 1fr;
-
-        gap: 5px;
-    }
-
-    .file-grid {
-        grid-template-columns:
-            repeat(
-                auto-fill,
-                minmax(145px, 1fr)
-            );
-
-        gap: 10px;
-    }
-
-    .file {
-        min-height: 120px;
-
-        padding: 14px;
-    }
-
-    .icon {
-        font-size: 30px;
-    }
-
-    .toolbar {
-        width: 100%;
-    }
-
-    .toolbar button {
-        flex: 1;
-    }
-
-}
-
-
-/* =========================
-   TRES PETITS ECRANS
-========================= */
-
-@media (max-width: 430px) {
-
-    .main-nav {
-        display: grid;
-
-        grid-template-columns:
-            1fr 1fr;
-    }
-
-    .main-nav button {
-        width: 100%;
-    }
-
-    .file-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .file {
-        min-height: auto;
-    }
-
-    .actions button {
-        flex: 1;
-    }
-
-}
+</body>
+</html>

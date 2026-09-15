@@ -1,724 +1,46 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Accueil</title>
-
-<style>
-*{box-sizing:border-box}
-
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f4f6fa;
-    color:#182033;
+* {
+    box-sizing: border-box;
 }
 
-header{
-    background:white;
-    border-bottom:1px solid #ddd;
-    padding:15px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:15px;
-    position:sticky;
-    top:0;
-    z-index:10;
+html {
+    scroll-behavior: smooth;
 }
 
-header h1{
-    margin:0;
-    font-size:23px;
-}
-
-nav{
-    display:flex;
-    gap:7px;
-    flex-wrap:wrap;
-}
-
-button{
-    border:0;
-    border-radius:9px;
-    padding:10px 14px;
-    background:#315bd6;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-button.secondary{
-    background:#e8ecf4;
-    color:#182033;
-}
-
-button.danger{
-    background:#d9363e;
-}
-
-main{
-    max-width:1100px;
-    margin:25px auto;
-    padding:0 16px;
-}
-
-.card{
-    background:white;
-    border-radius:17px;
-    padding:22px;
-    margin-bottom:18px;
-    box-shadow:0 4px 18px #0001;
-}
-
-.hidden{
-    display:none!important;
-}
-
-.muted{
-    color:#687386;
-}
-
-.center{
-    text-align:center;
-}
-
-.toolbar{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-bottom:18px;
-}
-
-.breadcrumb{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    flex-wrap:wrap;
-    margin-bottom:18px;
-}
-
-.breadcrumb button{
-    background:transparent;
-    color:#315bd6;
-    padding:3px;
-}
-
-.file-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-    gap:15px;
-}
-
-.file{
-    background:#fafbfe;
-    border:1px solid #dbe1eb;
-    border-radius:14px;
-    padding:17px;
-    min-height:135px;
-    cursor:pointer;
-    transition:.15s;
-}
-
-.file:hover{
-    transform:translateY(-2px);
-    box-shadow:0 5px 15px #0001;
-}
-
-.icon{
-    font-size:36px;
-    margin-bottom:10px;
-}
-
-.file-title{
-    font-weight:bold;
-    word-break:break-word;
-}
-
-.admin-item{
-    border:1px solid #d7deea;
-    border-left:7px solid var(--color);
-    border-radius:12px;
-    padding:14px;
-    margin:10px 0;
-    background:#fafbfe;
-}
-
-.actions{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-    margin-top:10px;
-}
-
-input,
-textarea,
-select{
-    width:100%;
-    padding:11px;
-    border:1px solid #ccd3df;
-    border-radius:9px;
-    font:inherit;
-    margin:6px 0 15px;
-}
-
-textarea{
-    min-height:100px;
-    resize:vertical;
-}
-
-label{
-    display:block;
-    font-weight:bold;
-    margin-top:7px;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-}
-
-.color-preview{
-    height:35px;
-    border-radius:9px;
-    margin-bottom:15px;
-}
-
-.memo{
-    line-height:1.7;
-    white-space:pre-wrap;
-}
-
-.memo img{
-    max-width:100%;
-    max-height:450px;
-    border-radius:12px;
-    margin-top:15px;
-}
-
-audio{
-    width:100%;
-    margin-top:15px;
-}
-
-.exercise{
-    background:#eef3ff;
-    border-radius:12px;
-    padding:17px;
-    margin-top:18px;
-}
-
-.result{
-    margin-top:10px;
-    padding:9px;
-    border-radius:8px;
-}
-
-.ok{
-    background:#e8f7ed;
-    color:#176b38;
-}
-
-.no{
-    background:#ffe8eb;
-    color:#a51d2d;
-}
-
-.notice{
-    background:#f0f3f8;
-    padding:13px;
-    border-radius:10px;
-}
-
-@media(max-width:700px){
-    header{
-        flex-direction:column;
-        align-items:stretch;
-    }
-
-    .grid{
-        grid-template-columns:1fr;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<header>
-
-<h1 id="siteTitle">Accueil</h1>
-
-<nav>
-
-<button class="secondary" onclick="showHome()">
-Accueil
-</button>
-
-<button class="secondary" onclick="showLearn()">
-Apprendre
-</button>
-
-<button class="secondary" onclick="showLogin()">
-Se connecter
-</button>
-
-<span id="adminButton"></span>
-
-</nav>
-
-</header>
-
-
-<main>
-
-<!-- ACCUEIL -->
-
-<section id="home">
-
-<div class="card">
-
-<h2>Accueil</h2>
-
-<p class="muted">
-Explore les matières, les dossiers, les mémos et les exercices.
-</p>
-
-<div id="homeExplorer"></div>
-
-</div>
-
-</section>
-
-
-<!-- APPRENDRE -->
-
-<section id="learn" class="hidden">
-
-<div class="card">
-
-<h2>Apprendre</h2>
-
-<p class="muted">
-Crée et organise les matières et les ressources.
-</p>
-
-<div id="learnExplorer"></div>
-
-</div>
-
-</section>
-
-
-<!-- CONNEXION -->
-
-<section id="login" class="hidden">
-
-<div class="card">
-
-<h2>Se connecter</h2>
-
-<label>Prénom</label>
-
-<input
-id="firstName"
-type="text"
-autocomplete="off"
->
-
-<label>Nom de famille</label>
-
-<input
-id="lastName"
-type="text"
-autocomplete="off"
->
-
-<button onclick="login()">
-Se connecter
-</button>
-
-<p id="loginMessage"></p>
-
-</div>
-
-</section>
-
-
-<!-- ADMIN -->
-
-<section id="admin" class="hidden">
-
-<div class="card">
-
-<div class="toolbar">
-
-<button onclick="newItem(currentFolder)">
-+ Nouveau fichier
-</button>
-
-<button class="secondary" onclick="logout()">
-Déconnexion
-</button>
-
-</div>
-
-<div id="adminExplorer"></div>
-
-</div>
-
-
-<!-- EDITEUR -->
-
-<div id="editor" class="card hidden">
-
-<h2 id="editorTitle">
-Nouveau fichier
-</h2>
-
-<input
-type="hidden"
-id="editId"
->
-
-<input
-type="hidden"
-id="editParent"
->
-
-<div class="grid">
-
-<div>
-
-<label>Nom</label>
-
-<input
-id="itemName"
-placeholder="Nom du fichier ou dossier"
->
-
-
-<label>Type</label>
-
-<select
-id="itemType"
-onchange="changeType()"
->
-
-<option value="folder">
-📁 Dossier
-</option>
-
-<option value="memo">
-📄 Mémo
-</option>
-
-<option value="exercise">
-📝 Exercice
-</option>
-
-</select>
-
-
-<label>Couleur</label>
-
-<input
-id="itemColor"
-type="color"
-value="#315bd6"
-oninput="updateColor()"
->
-
-<div
-id="colorPreview"
-class="color-preview"
-style="background:#315bd6">
-</div>
-
-</div>
-
-
-<div id="memoFields">
-
-<label>Texte</label>
-
-<textarea
-id="itemText"
-placeholder="Écris ton mémo..."
-></textarea>
-
-
-<label>Image</label>
-
-<input
-id="itemImageUrl"
-placeholder="Lien vers une image"
->
-
-<input
-id="itemImageFile"
-type="file"
-accept="image/*"
->
-
-
-<label>Son / MP3</label>
-
-<input
-id="itemAudioUrl"
-placeholder="Lien vers un son"
->
-
-<input
-id="itemAudioFile"
-type="file"
-accept="audio/*"
->
-
-</div>
-
-</div>
-
-
-<div
-id="exerciseFields"
-class="hidden"
->
-
-<label>Question</label>
-
-<textarea
-id="question"
-placeholder="Écris la question..."
-></textarea>
-
-
-<label>Réponse attendue</label>
-
-<input
-id="answer"
-placeholder="Réponse"
->
-
-</div>
-
-
-<div class="toolbar">
-
-<button onclick="saveItem()">
-Enregistrer
-</button>
-
-<button
-class="secondary"
-onclick="closeEditor()"
->
-Annuler
-</button>
-
-</div>
-
-</div>
-
-
-<!-- SAUVEGARDE -->
-
-<div class="card">
-
-<h3>Sauvegarde</h3>
-
-<button
-class="secondary"
-onclick="exportData()"
->
-Exporter
-</button>
-
-<button
-class="secondary"
-onclick="document.getElementById('importFile').click()"
->
-Importer
-</button>
-
-<input
-id="importFile"
-class="hidden"
-type="file"
-accept=".json"
-onchange="importData(event)"
->
-
-</div>
-
-</section>
-
-</main>
-
-
-<script>
-
-const STORAGE_KEY =
-"mini_ordinateur_educatif";
-
-
-let data = loadData();
-
-let currentFolder = "";
-
-
-/* =========================
-   DONNEES
-========================= */
-
-function loadData(){
-
-    try{
-
-        return JSON.parse(
-            localStorage.getItem(
-                STORAGE_KEY
-            )
-        ) || {
-            title:"Accueil",
-            items:[]
-        };
-
-    }catch(e){
-
-        return {
-            title:"Accueil",
-            items:[]
-        };
-
-    }
-
-}
-
-
-function saveData(){
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(data)
-    );
-
-}
-
-
-function createId(){
-
-    return Date.now()
-        .toString(36)
-        +
-        Math.random()
-        .toString(36)
-        .substring(2);
-
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6fa;
+    color: #182033;
 }
 
 
 /* =========================
-   RECHERCHE
+   HEADER
 ========================= */
 
-function findItem(
-    id,
-    items=data.items
-){
+.site-header {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 20px;
 
-    for(
-        const item of items
-    ){
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
 
-        if(item.id===id){
-
-            return item;
-
-        }
-
-        const found =
-            findItem(
-                id,
-                item.children || []
-            );
-
-        if(found){
-
-            return found;
-
-        }
-
-    }
-
-    return null;
-
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-
-function findParent(
-    id,
-    items=data.items,
-    parent=null
-){
-
-    for(
-        const item of items
-    ){
-
-        if(item.id===id){
-
-            return parent;
-
-        }
-
-        const found =
-            findParent(
-                id,
-                item.children || [],
-                item
-            );
-
-        if(found){
-
-            return found;
-
-        }
-
-    }
-
-    return null;
-
+.site-header h1 {
+    margin: 0;
+    font-size: 23px;
 }
 
-
-function getItems(folderId){
-
-    if(!folderId){
-
-        return data.items;
-
-    }
-
-    const folder =
-        findItem(folderId);
-
-    if(!folder){
-
-        return data.items;
-
-    }
-
-    if(!folder.children){
-
-        folder.children=[];
-
-    }
-
-    return folder.children;
-
+.header-left {
+    display: flex;
+    align-items: center;
 }
 
 
@@ -726,207 +48,100 @@ function getItems(folderId){
    NAVIGATION
 ========================= */
 
-function hideSections(){
-
-    [
-        "home",
-        "learn",
-        "login",
-        "admin"
-    ]
-    .forEach(
-        id=>{
-            document
-            .getElementById(id)
-            .classList
-            .add("hidden");
-        }
-    );
-
+.main-nav {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
+button {
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 14px;
 
-function showHome(){
+    background: #315bd6;
+    color: white;
 
-    hideSections();
+    font-weight: bold;
+    cursor: pointer;
 
-    document
-    .getElementById("home")
-    .classList
-    .remove("hidden");
-
-    renderHome();
-
+    transition:
+        transform .15s,
+        opacity .15s,
+        box-shadow .15s;
 }
 
-
-function showLearn(){
-
-    hideSections();
-
-    document
-    .getElementById("learn")
-    .classList
-    .remove("hidden");
-
-    renderLearn();
-
+button:hover {
+    opacity: .92;
+    transform: translateY(-1px);
 }
 
+button:active {
+    transform: translateY(0);
+}
 
-function showLogin(){
+button.secondary {
+    background: #e8ecf4;
+    color: #182033;
+}
 
-    hideSections();
+button.danger {
+    background: #d9363e;
+}
 
-    document
-    .getElementById("login")
-    .classList
-    .remove("hidden");
-
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
 }
 
 
 /* =========================
-   CONNEXION
+   CONTENU
 ========================= */
 
-function login(){
+main {
+    width: 100%;
+    max-width: 1100px;
 
-    const first =
-        document
-        .getElementById(
-            "firstName"
-        )
-        .value
-        .trim()
-        .toLowerCase();
-
-
-    const last =
-        document
-        .getElementById(
-            "lastName"
-        )
-        .value
-        .trim()
-        .toLowerCase();
-
-
-    if(
-        first==="ziyad" &&
-        last==="hamied"
-    ){
-
-        sessionStorage.setItem(
-            "adminConnected",
-            "true"
-        );
-
-        document
-        .getElementById(
-            "loginMessage"
-        )
-        .textContent="";
-
-        showAdmin();
-
-    }else{
-
-        document
-        .getElementById(
-            "loginMessage"
-        )
-        .className="no";
-
-        document
-        .getElementById(
-            "loginMessage"
-        )
-        .textContent=
-            "Identifiants incorrects.";
-
-    }
-
+    margin: 25px auto;
+    padding: 0 16px;
 }
 
+.card {
+    background: white;
+    border-radius: 17px;
 
-function showAdmin(){
+    padding: 22px;
+    margin-bottom: 18px;
 
-    if(
-        sessionStorage.getItem(
-            "adminConnected"
-        )!=="true"
-    ){
-
-        showLogin();
-
-        return;
-
-    }
-
-
-    hideSections();
-
-    document
-    .getElementById("admin")
-    .classList
-    .remove("hidden");
-
-
-    document
-    .getElementById(
-        "adminButton"
-    )
-    .innerHTML=
-        '<button onclick="showAdmin()">Administration</button>';
-
-
-    renderAdmin();
-
+    box-shadow: 0 4px 18px #0001;
 }
 
+.hidden {
+    display: none !important;
+}
 
-function logout(){
+.muted {
+    color: #687386;
+}
 
-    sessionStorage.removeItem(
-        "adminConnected"
-    );
-
-    document
-    .getElementById(
-        "adminButton"
-    )
-    .innerHTML="";
-
-    showHome();
-
+.center {
+    text-align: center;
 }
 
 
 /* =========================
-   ICONES
+   BARRE D'OUTILS
 ========================= */
 
-function getIcon(item){
+.toolbar {
+    display: flex;
+    gap: 8px;
 
-    if(
-        item.type==="folder"
-    ){
+    flex-wrap: wrap;
 
-        return "📁";
-
-    }
-
-    if(
-        item.type==="exercise"
-    ){
-
-        return "📝";
-
-    }
-
-    return "📄";
-
+    margin-bottom: 18px;
 }
 
 
@@ -934,1309 +149,475 @@ function getIcon(item){
    FIL D'ARIANE
 ========================= */
 
-function breadcrumb(
-    folderId,
-    functionName
-){
+.breadcrumb {
+    display: flex;
+    align-items: center;
 
-    let html=
-        `<div class="breadcrumb">
-        <button onclick="${functionName}('')">
-        Accueil
-        </button>`;
+    gap: 6px;
+    flex-wrap: wrap;
 
-    const chain=[];
+    margin-bottom: 18px;
+}
 
-    let current=
-        folderId;
+.breadcrumb button {
+    background: transparent;
+    color: #315bd6;
 
+    padding: 3px;
+}
 
-    while(current){
-
-        const item=
-            findItem(current);
-
-        if(!item){
-
-            break;
-
-        }
-
-        chain.unshift(item);
-
-        const parent=
-            findParent(current);
-
-        current=
-            parent
-            ? parent.id
-            : "";
-
-    }
-
-
-    chain.forEach(
-        item=>{
-
-            html+=
-            `<span>›</span>
-            <button onclick="${functionName}('${item.id}')">
-            ${escapeHtml(item.name)}
-            </button>`;
-
-        }
-    );
-
-
-    html+="</div>";
-
-    return html;
-
+.breadcrumb span {
+    color: #8993a5;
 }
 
 
 /* =========================
-   EXPLORATEUR PUBLIC
+   EXPLORATEUR
 ========================= */
 
-function renderHome(){
+.file-grid {
+    display: grid;
 
-    renderPublicFolder("");
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(190px, 1fr)
+        );
 
+    gap: 15px;
 }
 
+.file {
+    background: #fafbfe;
 
-function openPublic(folderId){
+    border: 1px solid #dbe1eb;
+    border-radius: 14px;
 
-    const item=
-        folderId
-        ? findItem(folderId)
-        : null;
+    padding: 17px;
 
+    min-height: 135px;
 
-    if(
-        item &&
-        item.type!=="folder"
-    ){
+    cursor: pointer;
 
-        showItem(item);
-
-        return;
-
-    }
-
-
-    renderPublicFolder(
-        folderId
-    );
-
+    transition:
+        transform .15s,
+        box-shadow .15s,
+        background .15s;
 }
 
+.file:hover {
+    transform: translateY(-2px);
 
-function renderPublicFolder(
-    folderId
-){
+    box-shadow:
+        0 5px 15px #0001;
 
-    const container=
-        document
-        .getElementById(
-            "homeExplorer"
-        );
+    background: white;
+}
 
+.icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
 
-    const items=
-        getItems(folderId);
+.file-title {
+    font-weight: bold;
 
+    word-break: break-word;
 
-    let html=
-        breadcrumb(
-            folderId,
-            "openPublic"
-        );
-
-
-    if(items.length===0){
-
-        html+=
-        `<div class="notice">
-        Aucun fichier ici.
-        </div>`;
-
-    }else{
-
-        html+=
-        `<div class="file-grid">`;
-
-
-        items.forEach(
-            item=>{
-
-                html+=
-                `<div
-                    class="file"
-                    style="border-top:5px solid ${
-                        escapeAttr(
-                            item.color ||
-                            "#315bd6"
-                        )
-                    }"
-                    onclick="openPublic('${item.id}')"
-                >
-
-                    <div class="icon">
-                        ${getIcon(item)}
-                    </div>
-
-                    <div class="file-title">
-                        ${escapeHtml(item.name)}
-                    </div>
-
-                    <div class="muted">
-                        ${
-                            item.type==="folder"
-                            ? "Dossier"
-                            : item.type==="exercise"
-                            ? "Exercice"
-                            : "Mémo"
-                        }
-                    </div>
-
-                </div>`;
-
-            }
-        );
-
-
-        html+="</div>";
-
-    }
-
-
-    container.innerHTML=html;
-
+    line-height: 1.4;
 }
 
 
 /* =========================
-   AFFICHAGE D'UN ELEMENT
+   ADMINISTRATION
 ========================= */
 
-function showItem(item){
+.admin-item {
+    border: 1px solid #d7deea;
 
-    const container=
-        document
-        .getElementById(
-            "homeExplorer"
-        );
+    border-left:
+        7px solid var(--color);
 
+    border-radius: 12px;
 
-    let html=
-    `<div
-        class="card"
-        style="border-top:7px solid ${
-            escapeAttr(
-                item.color ||
-                "#315bd6"
-            )
-        }"
-    >
+    padding: 14px;
+    margin: 10px 0;
 
-        <div class="breadcrumb">
+    background: #fafbfe;
 
-            <button onclick="renderHome()">
-                Accueil
-            </button>
+    transition:
+        box-shadow .15s,
+        transform .15s;
+}
 
-        </div>
+.admin-item:hover {
+    box-shadow: 0 4px 12px #0001;
+    transform: translateY(-1px);
+}
 
-        <h2>
-            ${escapeHtml(item.name)}
-        </h2>`;
+.admin-item b {
+    display: block;
 
+    font-size: 16px;
 
-    if(
-        item.type==="memo"
-    ){
+    word-break: break-word;
+}
 
-        html+=
-        `<div class="memo">
-            ${escapeHtml(
-                item.text || ""
-            )}
-        </div>`;
+.actions {
+    display: flex;
 
+    gap: 6px;
+    flex-wrap: wrap;
 
-        if(item.image){
-
-            html+=
-            `<p>
-                <img
-                    src="${escapeAttr(item.image)}"
-                    alt=""
-                >
-            </p>`;
-
-        }
-
-
-        if(item.audio){
-
-            html+=
-            `<audio
-                controls
-                src="${escapeAttr(item.audio)}"
-            ></audio>`;
-
-        }
-
-    }
-
-
-    if(
-        item.type==="exercise"
-    ){
-
-        html+=
-        `<div class="exercise">
-
-            <strong>
-                📝 Exercice
-            </strong>
-
-            <p>
-                ${escapeHtml(
-                    item.question || ""
-                )}
-            </p>
-
-            <input
-                id="answer_${item.id}"
-                placeholder="Ta réponse"
-            >
-
-            <button
-                onclick="checkAnswer('${item.id}')"
-            >
-                Vérifier
-            </button>
-
-            <div
-                id="result_${item.id}"
-            ></div>
-
-        </div>`;
-
-    }
-
-
-    if(
-        item.type==="folder"
-    ){
-
-        html+=
-        `<div class="file-grid">`;
-
-
-        (
-            item.children || []
-        )
-        .forEach(
-            child=>{
-
-                html+=
-                `<div
-                    class="file"
-                    style="border-top:5px solid ${
-                        escapeAttr(
-                            child.color ||
-                            "#315bd6"
-                        )
-                    }"
-                    onclick="openPublic('${child.id}')"
-                >
-
-                    <div class="icon">
-                        ${getIcon(child)}
-                    </div>
-
-                    <div class="file-title">
-                        ${escapeHtml(
-                            child.name
-                        )}
-                    </div>
-
-                </div>`;
-
-            }
-        );
-
-
-        html+="</div>";
-
-    }
-
-
-    html+="</div>";
-
-    container.innerHTML=html;
-
+    margin-top: 10px;
 }
 
 
 /* =========================
-   APPRENDRE
+   FORMULAIRES
 ========================= */
 
-function renderLearn(){
+input,
+textarea,
+select {
+    width: 100%;
 
-    document
-    .getElementById(
-        "learnExplorer"
-    )
-    .innerHTML=
-        breadcrumb(
-            currentFolder,
-            "openLearn"
-        )
-        +
-        `<div class="notice">
-        Les contenus créés ici apparaissent automatiquement dans Accueil.
-        </div>`;
+    padding: 11px;
 
+    border:
+        1px solid #ccd3df;
+
+    border-radius: 9px;
+
+    font: inherit;
+
+    margin:
+        6px 0 15px;
+
+    background: white;
+
+    color: #182033;
+
+    outline: none;
+
+    transition:
+        border-color .15s,
+        box-shadow .15s;
 }
 
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #315bd6;
 
-function openLearn(folderId){
+    box-shadow:
+        0 0 0 3px #315bd620;
+}
 
-    currentFolder=
-        folderId || "";
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
 
-    renderLearn();
+label {
+    display: block;
 
+    font-weight: bold;
+
+    margin-top: 7px;
+    margin-bottom: 3px;
 }
 
 
 /* =========================
-   ADMINISTRATEUR
+   GRILLE EDITEUR
 ========================= */
 
-function renderAdmin(){
+.grid {
+    display: grid;
 
-    const container=
-        document
-        .getElementById(
-            "adminExplorer"
-        );
+    grid-template-columns:
+        1fr 1fr;
 
-
-    const items=
-        getItems(currentFolder);
-
-
-    let html=
-        breadcrumb(
-            currentFolder,
-            "adminOpen"
-        );
-
-
-    if(items.length===0){
-
-        html+=
-        `<div class="notice">
-        Ce dossier est vide.
-        </div>`;
-
-    }
-
-
-    items.forEach(
-        item=>{
-
-            html+=
-            `<div
-                class="admin-item"
-                style="--color:${
-                    escapeAttr(
-                        item.color ||
-                        "#315bd6"
-                    )
-                }"
-            >
-
-                <b>
-                    ${getIcon(item)}
-                    ${escapeHtml(item.name)}
-                </b>
-
-                <div class="muted">
-                    ${
-                        item.type==="folder"
-                        ? "Dossier"
-                        : item.type==="exercise"
-                        ? "Exercice"
-                        : "Mémo"
-                    }
-                </div>
-
-                <div class="actions">
-
-                    ${
-                        item.type==="folder"
-                        ?
-                        `
-                        <button
-                            onclick="adminOpen('${item.id}')"
-                        >
-                            Ouvrir
-                        </button>
-
-                        <button
-                            onclick="newItem('${item.id}')"
-                        >
-                            + Dedans
-                        </button>
-                        `
-                        :
-                        ""
-                    }
-
-                    <button
-                        class="secondary"
-                        onclick="editItem('${item.id}')"
-                    >
-                        Modifier
-                    </button>
-
-                    <button
-                        class="danger"
-                        onclick="deleteItem('${item.id}')"
-                    >
-                        Supprimer
-                    </button>
-
-                </div>
-
-            </div>`;
-
-        }
-    );
-
-
-    container.innerHTML=html;
-
-}
-
-
-function adminOpen(folderId){
-
-    const item=
-        folderId
-        ? findItem(folderId)
-        : null;
-
-
-    if(
-        item &&
-        item.type!=="folder"
-    ){
-
-        editItem(item.id);
-
-        return;
-
-    }
-
-
-    currentFolder=
-        folderId || "";
-
-    renderAdmin();
-
+    gap: 20px;
 }
 
 
 /* =========================
-   NOUVEAU
+   COULEUR
 ========================= */
 
-function newItem(parentId){
+.color-preview {
+    height: 35px;
 
-    openEditor(
-        null,
-        parentId || ""
-    );
+    border-radius: 9px;
 
-}
+    margin-bottom: 15px;
 
+    background: #315bd6;
 
-function editItem(id){
-
-    const item=
-        findItem(id);
-
-    if(!item)return;
-
-
-    const parent=
-        findParent(id);
-
-
-    openEditor(
-        item,
-        parent
-        ? parent.id
-        : ""
-    );
-
+    border:
+        1px solid #dbe1eb;
 }
 
 
 /* =========================
-   EDITEUR
+   MEMOS
 ========================= */
 
-function openEditor(
-    item,
-    parentId
-){
+.memo {
+    line-height: 1.7;
 
-    document
-    .getElementById(
-        "editor"
-    )
-    .classList
-    .remove("hidden");
+    white-space: pre-wrap;
 
-
-    document
-    .getElementById(
-        "editorTitle"
-    )
-    .textContent=
-        item
-        ? "Modifier"
-        : "Nouveau fichier";
-
-
-    document
-    .getElementById(
-        "editId"
-    )
-    .value=
-        item
-        ? item.id
-        : "";
-
-
-    document
-    .getElementById(
-        "editParent"
-    )
-    .value=
-        parentId;
-
-
-    document
-    .getElementById(
-        "itemName"
-    )
-    .value=
-        item
-        ? item.name
-        : "";
-
-
-    document
-    .getElementById(
-        "itemType"
-    )
-    .value=
-        item
-        ? item.type
-        : "folder";
-
-
-    document
-    .getElementById(
-        "itemColor"
-    )
-    .value=
-        item?.color ||
-        "#315bd6";
-
-
-    document
-    .getElementById(
-        "itemText"
-    )
-    .value=
-        item?.text ||
-        "";
-
-
-    document
-    .getElementById(
-        "itemImageUrl"
-    )
-    .value=
-        item?.image ||
-        "";
-
-
-    document
-    .getElementById(
-        "itemAudioUrl"
-    )
-    .value=
-        item?.audio ||
-        "";
-
-
-    document
-    .getElementById(
-        "question"
-    )
-    .value=
-        item?.question ||
-        "";
-
-
-    document
-    .getElementById(
-        "answer"
-    )
-    .value=
-        item?.answer ||
-        "";
-
-
-    document
-    .getElementById(
-        "itemImageFile"
-    )
-    .value="";
-
-
-    document
-    .getElementById(
-        "itemAudioFile"
-    )
-    .value="";
-
-
-    changeType();
-
-    updateColor();
-
-
-    document
-    .getElementById(
-        "editor"
-    )
-    .scrollIntoView({
-        behavior:"smooth"
-    });
-
+    overflow-wrap: anywhere;
 }
 
+.memo img {
+    display: block;
 
-function closeEditor(){
+    max-width: 100%;
+    max-height: 450px;
 
-    document
-    .getElementById(
-        "editor"
-    )
-    .classList
-    .add("hidden");
+    border-radius: 12px;
 
+    margin-top: 15px;
 }
 
+audio {
+    width: 100%;
 
-function changeType(){
-
-    const type=
-        document
-        .getElementById(
-            "itemType"
-        )
-        .value;
-
-
-    document
-    .getElementById(
-        "memoFields"
-    )
-    .classList
-    .toggle(
-        "hidden",
-        type!=="memo"
-    );
-
-
-    document
-    .getElementById(
-        "exerciseFields"
-    )
-    .classList
-    .toggle(
-        "hidden",
-        type!=="exercise"
-    );
-
-}
-
-
-function updateColor(){
-
-    document
-    .getElementById(
-        "colorPreview"
-    )
-    .style
-    .background=
-        document
-        .getElementById(
-            "itemColor"
-        )
-        .value;
-
+    margin-top: 15px;
 }
 
 
 /* =========================
-   FICHIERS
+   EXERCICES
 ========================= */
 
-function readFile(input){
+.exercise {
+    background: #eef3ff;
 
-    return new Promise(
-        resolve=>{
+    border-radius: 12px;
 
-            const file=
-                input.files[0];
+    padding: 17px;
 
+    margin-top: 18px;
+}
 
-            if(!file){
+.exercise strong {
+    display: block;
 
-                resolve("");
+    margin-bottom: 10px;
+}
 
-                return;
+.result {
+    margin-top: 10px;
 
-            }
+    padding: 9px;
 
+    border-radius: 8px;
+}
 
-            const reader=
-                new FileReader();
+.ok {
+    background: #e8f7ed;
 
+    color: #176b38;
+}
 
-            reader.onload=
-                ()=>{
-                    resolve(
-                        reader.result
-                    );
-                };
+.no {
+    background: #ffe8eb;
 
-
-            reader.onerror=
-                ()=>{
-                    resolve("");
-                };
-
-
-            reader.readAsDataURL(file);
-
-        }
-    );
-
+    color: #a51d2d;
 }
 
 
 /* =========================
-   ENREGISTRER
+   NOTIFICATIONS
 ========================= */
 
-async function saveItem(){
+.notice {
+    background: #f0f3f8;
 
-    const name=
-        document
-        .getElementById(
-            "itemName"
-        )
-        .value
-        .trim();
+    padding: 13px;
+
+    border-radius: 10px;
+
+    color: #687386;
+}
+
+#loginMessage {
+    margin-top: 12px;
+}
+
+#loginMessage.no {
+    background: #ffe8eb;
+
+    color: #a51d2d;
+
+    padding: 10px;
+
+    border-radius: 8px;
+}
+
+#loginMessage.ok {
+    background: #e8f7ed;
+
+    color: #176b38;
+
+    padding: 10px;
+
+    border-radius: 8px;
+}
 
 
-    if(!name){
+/* =========================
+   CHARGEMENT
+========================= */
 
-        alert(
-            "Donne un nom."
-        );
+.loading {
+    text-align: center;
 
-        return;
+    padding: 30px;
 
+    color: #687386;
+}
+
+
+/* =========================
+   LIENS / IMAGES
+========================= */
+
+img {
+    max-width: 100%;
+}
+
+a {
+    color: #315bd6;
+}
+
+
+/* =========================
+   CONNEXION
+========================= */
+
+.login-card {
+    max-width: 500px;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================
+   PETITS ECRANS
+========================= */
+
+@media (max-width: 700px) {
+
+    .site-header {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        padding: 13px 15px;
     }
 
-
-    const id=
-        document
-        .getElementById(
-            "editId"
-        )
-        .value;
-
-
-    const parentId=
-        document
-        .getElementById(
-            "editParent"
-        )
-        .value;
-
-
-    const type=
-        document
-        .getElementById(
-            "itemType"
-        )
-        .value;
-
-
-    let item=
-        id
-        ? findItem(id)
-        : null;
-
-
-    if(!item){
-
-        item={
-            id:createId(),
-            name:"",
-            type:"folder",
-            color:"#315bd6",
-            children:[]
-        };
-
-
-        getItems(parentId)
-        .push(item);
-
+    .header-left {
+        justify-content: center;
     }
 
-
-    item.name=name;
-
-    item.type=type;
-
-    item.color=
-        document
-        .getElementById(
-            "itemColor"
-        )
-        .value;
-
-
-    if(type==="folder"){
-
-        if(!item.children){
-
-            item.children=[];
-
-        }
-
-        delete item.text;
-        delete item.image;
-        delete item.audio;
-        delete item.question;
-        delete item.answer;
-
+    .site-header h1 {
+        font-size: 21px;
     }
 
+    .main-nav {
+        justify-content: center;
+    }
 
-    if(type==="memo"){
+    .main-nav button {
+        flex: 1;
 
-        item.text=
-            document
-            .getElementById(
-                "itemText"
-            )
-            .value;
+        min-width: 100px;
+    }
 
+    main {
+        margin-top: 18px;
 
-        const image=
-            await readFile(
-                document
-                .getElementById(
-                    "itemImageFile"
-                )
+        padding:
+            0 10px;
+    }
+
+    .card {
+        padding: 17px;
+
+        border-radius: 14px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+
+        gap: 5px;
+    }
+
+    .file-grid {
+        grid-template-columns:
+            repeat(
+                auto-fill,
+                minmax(145px, 1fr)
             );
 
-
-        item.image=
-            image ||
-            document
-            .getElementById(
-                "itemImageUrl"
-            )
-            .value
-            .trim();
-
-
-        const audio=
-            await readFile(
-                document
-                .getElementById(
-                    "itemAudioFile"
-                )
-            );
-
-
-        item.audio=
-            audio ||
-            document
-            .getElementById(
-                "itemAudioUrl"
-            )
-            .value
-            .trim();
-
-
-        delete item.question;
-        delete item.answer;
-
+        gap: 10px;
     }
 
+    .file {
+        min-height: 120px;
 
-    if(type==="exercise"){
-
-        item.question=
-            document
-            .getElementById(
-                "question"
-            )
-            .value;
-
-
-        item.answer=
-            document
-            .getElementById(
-                "answer"
-            )
-            .value;
-
-
-        delete item.text;
-        delete item.image;
-        delete item.audio;
-
+        padding: 14px;
     }
 
-
-    persist();
-
-    closeEditor();
-
-    renderAdmin();
-
-    renderHome();
-
-    renderLearn();
-
-}
-
-
-/* =========================
-   SUPPRIMER
-========================= */
-
-function deleteItem(id){
-
-    const item=
-        findItem(id);
-
-
-    if(!item)return;
-
-
-    if(
-        !confirm(
-            "Supprimer cet élément et tout son contenu ?"
-        )
-    ){
-
-        return;
-
+    .icon {
+        font-size: 30px;
     }
 
-
-    const parent=
-        findParent(id);
-
-
-    const array=
-        parent
-        ? parent.children
-        : data.items;
-
-
-    const index=
-        array.findIndex(
-            x=>x.id===id
-        );
-
-
-    if(index>=0){
-
-        array.splice(
-            index,
-            1
-        );
-
+    .toolbar {
+        width: 100%;
     }
 
-
-    persist();
-
-    renderAdmin();
-
-    renderHome();
-
-    renderLearn();
-
-}
-
-
-/* =========================
-   EXERCICE
-========================= */
-
-function checkAnswer(id){
-
-    const item=
-        findItem(id);
-
-
-    const value=
-        document
-        .getElementById(
-            "answer_"+id
-        )
-        .value
-        .trim()
-        .toLowerCase();
-
-
-    const expected=
-        (
-            item.answer ||
-            ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-    const result=
-        document
-        .getElementById(
-            "result_"+id
-        );
-
-
-    if(
-        value &&
-        value===expected
-    ){
-
-        result.className=
-            "result ok";
-
-        result.textContent=
-            "Bravo ! Bonne réponse.";
-
-    }else{
-
-        result.className=
-            "result no";
-
-        result.textContent=
-            "Essaie encore !";
-
+    .toolbar button {
+        flex: 1;
     }
 
 }
 
 
 /* =========================
-   EXPORT
+   TRES PETITS ECRANS
 ========================= */
 
-function exportData(){
+@media (max-width: 430px) {
 
-    const blob=
-        new Blob(
-            [
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                )
-            ],
-            {
-                type:
-                    "application/json"
-            }
-        );
+    .main-nav {
+        display: grid;
 
+        grid-template-columns:
+            1fr 1fr;
+    }
 
-    const url=
-        URL.createObjectURL(
-            blob
-        );
+    .main-nav button {
+        width: 100%;
+    }
 
+    .file-grid {
+        grid-template-columns: 1fr;
+    }
 
-    const link=
-        document.createElement(
-            "a"
-        );
+    .file {
+        min-height: auto;
+    }
 
-
-    link.href=url;
-
-    link.download=
-        "sauvegarde-apprendre.json";
-
-    link.click();
-
-
-    URL.revokeObjectURL(url);
+    .actions button {
+        flex: 1;
+    }
 
 }
-
-
-/* =========================
-   IMPORT
-========================= */
-
-function importData(event){
-
-    const file=
-        event.target.files[0];
-
-
-    if(!file)return;
-
-
-    const reader=
-        new FileReader();
-
-
-    reader.onload=()=>{
-
-        try{
-
-            const imported=
-                JSON.parse(
-                    reader.result
-                );
-
-
-            if(
-                !imported ||
-                !Array.isArray(
-                    imported.items
-                )
-            ){
-
-                throw new Error();
-
-            }
-
-
-            data=imported;
-
-            persist();
-
-            renderAdmin();
-
-            renderHome();
-
-            renderLearn();
-
-            alert(
-                "Import terminé."
-            );
-
-        }catch(e){
-
-            alert(
-                "Fichier invalide."
-            );
-
-        }
-
-    };
-
-
-    reader.readAsText(file);
-
-}
-
-
-/* =========================
-   SECURITE AFFICHAGE
-========================= */
-
-function escapeHtml(value){
-
-    return String(
-        value ?? ""
-    ).replace(
-        /[&<>"']/g,
-        character=>({
-
-            "&":"&amp;",
-            "<":"&lt;",
-            ">":"&gt;",
-            '"':"&quot;",
-            "'":"&#39;"
-
-        }[character])
-    );
-
-}
-
-
-function escapeAttr(value){
-
-    return escapeHtml(value);
-
-}
-
-
-/* =========================
-   DEMARRAGE
-========================= */
-
-if(
-    sessionStorage.getItem(
-        "adminConnected"
-    )==="true"
-){
-
-    document
-    .getElementById(
-        "adminButton"
-    )
-    .innerHTML=
-        '<button onclick="showAdmin()">Administration</button>';
-
-}
-
-
-renderHome();
-
-</script>
-
-</body>
-</html>

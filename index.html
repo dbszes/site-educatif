@@ -1,325 +1,180 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-```
-<title>Accueil</title>
+    <title>Accueil</title>
 
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- Style du site -->
-<link rel="stylesheet" href="style.css">
-```
-
+    <!-- Style du site -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header class="site-header">
 
-```
-<div class="header-left">
-    <h1 id="siteTitle">Accueil</h1>
-</div>
-
-<nav class="main-nav">
-
-    <button
-        class="nav-button secondary"
-        onclick="showHome()">
-        Accueil
-    </button>
-
-    <button
-        class="nav-button secondary"
-        onclick="showLearn()">
-        Apprendre
-    </button>
-
-    <button
-        class="nav-button secondary"
-        onclick="showLogin()">
-        Se connecter
-    </button>
-
-    <span id="adminButton"></span>
-
-</nav>
-```
-
-</header>
-
-<main>
-
-```
-<!-- =========================
-     ACCUEIL
-========================== -->
-
-<section id="home">
-
-    <div class="card">
-
-        <h2>Accueil</h2>
-
-        <p class="muted">
-            Explore les matières, les dossiers,
-            les mémos et les exercices.
-        </p>
-
-        <div id="homeExplorer">
-            <div class="notice">
-                Chargement...
-            </div>
-        </div>
-
+    <div class="header-left">
+        <h1 id="siteTitle">Accueil</h1>
     </div>
 
-</section>
+    <nav class="main-nav">
 
+        <button
+            class="nav-button secondary"
+            onclick="showHome()">
+            Accueil
+        </button>
 
-<!-- =========================
-     APPRENDRE
-========================== -->
+        <button
+            class="nav-button secondary"
+            onclick="showLearn()">
+            Apprendre
+        </button>
 
-<section id="learn" class="hidden">
-
-    <div class="card">
-
-        <h2>Apprendre</h2>
-
-        <p class="muted">
-            Crée et organise les matières
-            et les ressources.
-        </p>
-
-        <div id="learnExplorer">
-            <div class="notice">
-                Chargement...
-            </div>
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     CONNEXION
-========================== -->
-
-<section id="login" class="hidden">
-
-    <div class="card login-card">
-
-        <h2>Se connecter</h2>
-
-        <p class="muted">
-            Connecte-toi pour accéder
-            à l'administration.
-        </p>
-
-        <label for="firstName">
-            Prénom
-        </label>
-
-        <input
-            id="firstName"
-            type="text"
-            autocomplete="given-name"
-        >
-
-        <label for="lastName">
-            Nom de famille
-        </label>
-
-        <input
-            id="lastName"
-            type="text"
-            autocomplete="family-name"
-        >
-
-        <button onclick="login()">
+        <button
+            class="nav-button secondary"
+            onclick="showLogin()">
             Se connecter
         </button>
 
-        <p id="loginMessage"></p>
+        <span id="adminButton"></span>
 
-    </div>
+    </nav>
 
-</section>
+</header>
 
 
-<!-- =========================
-     ADMINISTRATION
-========================== -->
+<main>
 
-<section id="admin" class="hidden">
+    <!-- =========================
+         ACCUEIL
+    ========================== -->
 
-    <div class="card">
+    <section id="home">
 
-        <div class="toolbar">
+        <div class="card">
 
-            <button onclick="newItem(currentFolder)">
-                + Nouveau fichier
-            </button>
+            <h2>Accueil</h2>
 
-            <button
-                class="secondary"
-                onclick="logout()">
-                Déconnexion
-            </button>
+            <p class="muted">
+                Explore les matières, les dossiers,
+                les mémos et les exercices.
+            </p>
 
-        </div>
-
-        <div id="adminExplorer">
-
-            <div class="notice">
-                Chargement...
+            <div id="homeExplorer">
+                <div class="notice">
+                    Chargement...
+                </div>
             </div>
 
         </div>
 
-    </div>
+    </section>
 
 
     <!-- =========================
-         EDITEUR
+         APPRENDRE
     ========================== -->
 
-    <div id="editor" class="card hidden">
+    <section id="learn" class="hidden">
 
-        <h2 id="editorTitle">
-            Nouveau fichier
-        </h2>
+        <div class="card">
 
-        <input
-            type="hidden"
-            id="editId"
-        >
+            <h2>Apprendre</h2>
 
-        <input
-            type="hidden"
-            id="editParent"
-        >
+            <p class="muted">
+                Crée et organise les matières
+                et les ressources.
+            </p>
 
-
-        <div class="grid">
-
-            <div>
-
-                <label for="itemName">
-                    Nom
-                </label>
-
-                <input
-                    id="itemName"
-                    placeholder="Nom du fichier ou dossier"
-                >
-
-
-                <label for="itemType">
-                    Type
-                </label>
-
-                <select
-                    id="itemType"
-                    onchange="changeType()">
-
-                    <option value="folder">
-                        📁 Dossier
-                    </option>
-
-                    <option value="memo">
-                        📄 Mémo
-                    </option>
-
-                    <option value="exercise">
-                        📝 Exercice
-                    </option>
-
-                </select>
-
-
-                <label for="itemColor">
-                    Couleur
-                </label>
-
-                <input
-                    id="itemColor"
-                    type="color"
-                    value="#315bd6"
-                    oninput="updateColor()"
-                >
-
-                <div
-                    id="colorPreview"
-                    class="color-preview">
+            <div id="learnExplorer">
+                <div class="notice">
+                    Chargement...
                 </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         CONNEXION
+    ========================== -->
+
+    <section id="login" class="hidden">
+
+        <div class="card login-card">
+
+            <h2>Se connecter</h2>
+
+            <p class="muted">
+                Connecte-toi pour accéder
+                à l'administration.
+            </p>
+
+            <label for="firstName">
+                Prénom
+            </label>
+
+            <input
+                id="firstName"
+                type="text"
+                autocomplete="given-name"
+            >
+
+            <label for="lastName">
+                Nom de famille
+            </label>
+
+            <input
+                id="lastName"
+                type="text"
+                autocomplete="family-name"
+            >
+
+            <button onclick="login()">
+                Se connecter
+            </button>
+
+            <p id="loginMessage"></p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         ADMINISTRATION
+    ========================== -->
+
+    <section id="admin" class="hidden">
+
+        <div class="card">
+
+            <div class="toolbar">
+
+                <button onclick="newItem(currentFolder)">
+                    + Nouveau fichier
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="logout()">
+                    Déconnexion
+                </button>
 
             </div>
 
+            <div id="adminExplorer">
 
-            <!-- =========================
-                 MEMO
-            ========================== -->
-
-            <div id="memoFields">
-
-                <label for="itemText">
-                    Texte
-                </label>
-
-                <textarea
-                    id="itemText"
-                    placeholder="Écris ton mémo...">
-                </textarea>
-
-
-                <label for="itemImageUrl">
-                    Lien vers une image
-                </label>
-
-                <input
-                    id="itemImageUrl"
-                    placeholder="https://..."
-                >
-
-
-                <label for="itemImageFile">
-                    Image
-                </label>
-
-                <input
-                    id="itemImageFile"
-                    type="file"
-                    accept="image/*"
-                >
-
-
-                <label for="itemAudioUrl">
-                    Lien vers un son
-                </label>
-
-                <input
-                    id="itemAudioUrl"
-                    placeholder="https://..."
-                >
-
-
-                <label for="itemAudioFile">
-                    Son / MP3
-                </label>
-
-                <input
-                    id="itemAudioFile"
-                    type="file"
-                    accept="audio/*"
-                >
+                <div class="notice">
+                    Chargement...
+                </div>
 
             </div>
 
@@ -327,99 +182,235 @@
 
 
         <!-- =========================
-             EXERCICE
+             EDITEUR
         ========================== -->
 
-        <div
-            id="exerciseFields"
-            class="hidden">
+        <div id="editor" class="card hidden">
 
-            <label for="question">
-                Question
-            </label>
-
-            <textarea
-                id="question"
-                placeholder="Écris la question...">
-            </textarea>
-
-
-            <label for="answer">
-                Réponse attendue
-            </label>
+            <h2 id="editorTitle">
+                Nouveau fichier
+            </h2>
 
             <input
-                id="answer"
-                placeholder="Réponse"
+                type="hidden"
+                id="editId"
+            >
+
+            <input
+                type="hidden"
+                id="editParent"
+            >
+
+
+            <div class="grid">
+
+                <div>
+
+                    <label for="itemName">
+                        Nom
+                    </label>
+
+                    <input
+                        id="itemName"
+                        placeholder="Nom du fichier ou dossier"
+                    >
+
+
+                    <label for="itemType">
+                        Type
+                    </label>
+
+                    <select
+                        id="itemType"
+                        onchange="changeType()">
+
+                        <option value="folder">
+                            📁 Dossier
+                        </option>
+
+                        <option value="memo">
+                            📄 Mémo
+                        </option>
+
+                        <option value="exercise">
+                            📝 Exercice
+                        </option>
+
+                    </select>
+
+
+                    <label for="itemColor">
+                        Couleur
+                    </label>
+
+                    <input
+                        id="itemColor"
+                        type="color"
+                        value="#315bd6"
+                        oninput="updateColor()"
+                    >
+
+                    <div
+                        id="colorPreview"
+                        class="color-preview">
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     MEMO
+                ========================== -->
+
+                <div id="memoFields">
+
+                    <label for="itemText">
+                        Texte
+                    </label>
+
+                    <textarea
+                        id="itemText"
+                        placeholder="Écris ton mémo..."></textarea>
+
+
+                    <label for="itemImageUrl">
+                        Lien vers une image
+                    </label>
+
+                    <input
+                        id="itemImageUrl"
+                        placeholder="https://..."
+                    >
+
+
+                    <label for="itemImageFile">
+                        Image
+                    </label>
+
+                    <input
+                        id="itemImageFile"
+                        type="file"
+                        accept="image/*"
+                    >
+
+
+                    <label for="itemAudioUrl">
+                        Lien vers un son
+                    </label>
+
+                    <input
+                        id="itemAudioUrl"
+                        placeholder="https://..."
+                    >
+
+
+                    <label for="itemAudioFile">
+                        Son / MP3
+                    </label>
+
+                    <input
+                        id="itemAudioFile"
+                        type="file"
+                        accept="audio/*"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 EXERCICE
+            ========================== -->
+
+            <div
+                id="exerciseFields"
+                class="hidden">
+
+                <label for="question">
+                    Question
+                </label>
+
+                <textarea
+                    id="question"
+                    placeholder="Écris la question..."></textarea>
+
+
+                <label for="answer">
+                    Réponse attendue
+                </label>
+
+                <input
+                    id="answer"
+                    placeholder="Réponse"
+                >
+
+            </div>
+
+
+            <div class="toolbar">
+
+                <button onclick="saveItem()">
+                    Enregistrer
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="closeEditor()">
+                    Annuler
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             SAUVEGARDE
+        ========================== -->
+
+        <div class="card">
+
+            <h3>Sauvegarde</h3>
+
+            <p class="muted">
+                Les données principales sont enregistrées
+                en ligne avec Supabase.
+            </p>
+
+            <div class="toolbar">
+
+                <button
+                    class="secondary"
+                    onclick="exportData()">
+                    Exporter
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="document.getElementById('importFile').click()">
+                    Importer
+                </button>
+
+            </div>
+
+
+            <input
+                id="importFile"
+                class="hidden"
+                type="file"
+                accept=".json"
+                onchange="importData(event)"
             >
 
         </div>
 
-
-        <div class="toolbar">
-
-            <button onclick="saveItem()">
-                Enregistrer
-            </button>
-
-            <button
-                class="secondary"
-                onclick="closeEditor()">
-                Annuler
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         SAUVEGARDE
-    ========================== -->
-
-    <div class="card">
-
-        <h3>Sauvegarde</h3>
-
-        <p class="muted">
-            Les données principales sont enregistrées
-            en ligne avec Supabase.
-        </p>
-
-        <div class="toolbar">
-
-            <button
-                class="secondary"
-                onclick="exportData()">
-                Exporter
-            </button>
-
-            <button
-                class="secondary"
-                onclick="document.getElementById('importFile').click()">
-                Importer
-            </button>
-
-        </div>
-
-
-        <input
-            id="importFile"
-            class="hidden"
-            type="file"
-            accept=".json"
-            onchange="importData(event)"
-        >
-
-    </div>
-
-</section>
-```
+    </section>
 
 </main>
 
-<!-- JavaScript du site -->
 
+<!-- JavaScript du site -->
 <script src="app.js"></script>
 
 </body>

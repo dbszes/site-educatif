@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accueil</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f6fa;
+    color:#182033;
+}
+
+header{
+    background:white;
+    border-bottom:1px solid #ddd;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+header h1{
+    margin:0;
+    font-size:23px;
+}
+
+nav{
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+}
+
+button{
+    border:0;
+    border-radius:9px;
+    padding:10px 14px;
+    background:#315bd6;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button.secondary{
+    background:#e8ecf4;
+    color:#182033;
+}
+
+button.danger{
+    background:#d9363e;
+}
+
+main{
+    max-width:1100px;
+    margin:25px auto;
+    padding:0 16px;
+}
+
+.card{
+    background:white;
+    border-radius:17px;
+    padding:22px;
+    margin-bottom:18px;
+    box-shadow:0 4px 18px #0001;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.muted{
+    color:#687386;
+}
+
+.center{
+    text-align:center;
+}
+
+.toolbar{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+}
+
+.breadcrumb{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+}
+
+.breadcrumb button{
+    background:transparent;
+    color:#315bd6;
+    padding:3px;
+}
+
+.file-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+    gap:15px;
+}
+
+.file{
+    background:#fafbfe;
+    border:1px solid #dbe1eb;
+    border-radius:14px;
+    padding:17px;
+    min-height:135px;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.file:hover{
+    transform:translateY(-2px);
+    box-shadow:0 5px 15px #0001;
+}
+
+.icon{
+    font-size:36px;
+    margin-bottom:10px;
+}
+
+.file-title{
+    font-weight:bold;
+    word-break:break-word;
+}
+
+.admin-item{
+    border:1px solid #d7deea;
+    border-left:7px solid var(--color);
+    border-radius:12px;
+    padding:14px;
+    margin:10px 0;
+    background:#fafbfe;
+}
+
+.actions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-top:10px;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    padding:11px;
+    border:1px solid #ccd3df;
+    border-radius:9px;
+    font:inherit;
+    margin:6px 0 15px;
+}
+
+textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin-top:7px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.color-preview{
+    height:35px;
+    border-radius:9px;
+    margin-bottom:15px;
+}
+
+.memo{
+    line-height:1.7;
+    white-space:pre-wrap;
+}
+
+.memo img{
+    max-width:100%;
+    max-height:450px;
+    border-radius:12px;
+    margin-top:15px;
+}
+
+audio{
+    width:100%;
+    margin-top:15px;
+}
+
+.exercise{
+    background:#eef3ff;
+    border-radius:12px;
+    padding:17px;
+    margin-top:18px;
+}
+
+.result{
+    margin-top:10px;
+    padding:9px;
+    border-radius:8px;
+}
+
+.ok{
+    background:#e8f7ed;
+    color:#176b38;
+}
+
+.no{
+    background:#ffe8eb;
+    color:#a51d2d;
+}
+
+.notice{
+    background:#f0f3f8;
+    padding:13px;
+    border-radius:10px;
+}
+
+@media(max-width:700px){
+    header{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1 id="siteTitle">Accueil</h1>
+
+<nav>
+
+<button class="secondary" onclick="showHome()">
+Accueil
+</button>
+
+<button class="secondary" onclick="showLearn()">
+Apprendre
+</button>
+
+<button class="secondary" onclick="showLogin()">
+Se connecter
+</button>
+
+<span id="adminButton"></span>
+
+</nav>
+
+</header>
+
+
+<main>
+
+<!-- ACCUEIL -->
+
+<section id="home">
+
+<div class="card">
+
+<h2>Accueil</h2>
+
+<p class="muted">
+Explore les matières, les dossiers, les mémos et les exercices.
+</p>
+
+<div id="homeExplorer"></div>
+
+</div>
+
+</section>
+
+
+<!-- APPRENDRE -->
+
+<section id="learn" class="hidden">
+
+<div class="card">
+
+<h2>Apprendre</h2>
+
+<p class="muted">
+Crée et organise les matières et les ressources.
+</p>
+
+<div id="learnExplorer"></div>
+
+</div>
+
+</section>
+
+
+<!-- CONNEXION -->
+
+<section id="login" class="hidden">
+
+<div class="card">
+
+<h2>Se connecter</h2>
+
+<label>Prénom</label>
+
+<input
+id="firstName"
+type="text"
+autocomplete="off"
+>
+
+<label>Nom de famille</label>
+
+<input
+id="lastName"
+type="text"
+autocomplete="off"
+>
+
+<button onclick="login()">
+Se connecter
+</button>
+
+<p id="loginMessage"></p>
+
+</div>
+
+</section>
+
+
+<!-- ADMIN -->
+
+<section id="admin" class="hidden">
+
+<div class="card">
+
+<div class="toolbar">
+
+<button onclick="newItem(currentFolder)">
++ Nouveau fichier
+</button>
+
+<button class="secondary" onclick="logout()">
+Déconnexion
+</button>
+
+</div>
+
+<div id="adminExplorer"></div>
+
+</div>
+
+
+<!-- EDITEUR -->
+
+<div id="editor" class="card hidden">
+
+<h2 id="editorTitle">
+Nouveau fichier
+</h2>
+
+<input
+type="hidden"
+id="editId"
+>
+
+<input
+type="hidden"
+id="editParent"
+>
+
+<div class="grid">
+
+<div>
+
+<label>Nom</label>
+
+<input
+id="itemName"
+placeholder="Nom du fichier ou dossier"
+>
+
+
+<label>Type</label>
+
+<select
+id="itemType"
+onchange="changeType()"
+>
+
+<option value="folder">
+📁 Dossier
+</option>
+
+<option value="memo">
+📄 Mémo
+</option>
+
+<option value="exercise">
+📝 Exercice
+</option>
+
+</select>
+
+
+<label>Couleur</label>
+
+<input
+id="itemColor"
+type="color"
+value="#315bd6"
+oninput="updateColor()"
+>
+
+<div
+id="colorPreview"
+class="color-preview"
+style="background:#315bd6">
+</div>
+
+</div>
+
+
+<div id="memoFields">
+
+<label>Texte</label>
+
+<textarea
+id="itemText"
+placeholder="Écris ton mémo..."
+></textarea>
+
+
+<label>Image</label>
+
+<input
+id="itemImageUrl"
+placeholder="Lien vers une image"
+>
+
+<input
+id="itemImageFile"
+type="file"
+accept="image/*"
+>
+
+
+<label>Son / MP3</label>
+
+<input
+id="itemAudioUrl"
+placeholder="Lien vers un son"
+>
+
+<input
+id="itemAudioFile"
+type="file"
+accept="audio/*"
+>
+
+</div>
+
+</div>
+
+
+<div
+id="exerciseFields"
+class="hidden"
+>
+
+<label>Question</label>
+
+<textarea
+id="question"
+placeholder="Écris la question..."
+></textarea>
+
+
+<label>Réponse attendue</label>
+
+<input
+id="answer"
+placeholder="Réponse"
+>
+
+</div>
+
+
+<div class="toolbar">
+
+<button onclick="saveItem()">
+Enregistrer
+</button>
+
+<button
+class="secondary"
+onclick="closeEditor()"
+>
+Annuler
+</button>
+
+</div>
+
+</div>
+
+
+<!-- SAUVEGARDE -->
+
+<div class="card">
+
+<h3>Sauvegarde</h3>
+
+<button
+class="secondary"
+onclick="exportData()"
+>
+Exporter
+</button>
+
+<button
+class="secondary"
+onclick="document.getElementById('importFile').click()"
+>
+Importer
+</button>
+
+<input
+id="importFile"
+class="hidden"
+type="file"
+accept=".json"
+onchange="importData(event)"
+>
+
+</div>
+
+</section>
+
+</main>
+
+
+<script>
+
+const STORAGE_KEY =
+"mini_ordinateur_educatif";
+
+
+let data = loadData();
+
+let currentFolder = "";
+
+
+/* =========================
+   DONNEES
+========================= */
+
+function loadData(){
+
+    try{
+
+        return JSON.parse(
+            localStorage.getItem(
+                STORAGE_KEY
+            )
+        ) || {
+            title:"Accueil",
+            items:[]
+        };
+
+    }catch(e){
+
+        return {
+            title:"Accueil",
+            items:[]
+        };
+
+    }
+
+}
+
+
+function saveData(){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
+
+}
+
+
+function createId(){
+
+    return Date.now()
+        .toString(36)
+        +
+        Math.random()
+        .toString(36)
+        .substring(2);
+
+}
+
+
+/* =========================
+   RECHERCHE
+========================= */
+
+function findItem(
+    id,
+    items=data.items
+){
+
+    for(
+        const item of items
+    ){
+
+        if(item.id===id){
+
+            return item;
+
+        }
+
+        const found =
+            findItem(
+                id,
+                item.children || []
+            );
+
+        if(found){
+
+            return found;
+
+        }
+
+    }
+
+    return null;
+
+}
+
+
+function findParent(
+    id,
+    items=data.items,
+    parent=null
+){
+
+    for(
+        const item of items
+    ){
+
+        if(item.id===id){
+
+            return parent;
+
+        }
+
+        const found =
+            findParent(
+                id,
+                item.children || [],
+                item
+            );
+
+        if(found){
+
+            return found;
+
+        }
+
+    }
+
+    return null;
+
+}
+
+
+function getItems(folderId){
+
+    if(!folderId){
+
+        return data.items;
+
+    }
+
+    const folder =
+        findItem(folderId);
+
+    if(!folder){
+
+        return data.items;
+
+    }
+
+    if(!folder.children){
+
+        folder.children=[];
+
+    }
+
+    return folder.children;
+
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function hideSections(){
+
+    [
+        "home",
+        "learn",
+        "login",
+        "admin"
+    ]
+    .forEach(
+        id=>{
+            document
+            .getElementById(id)
+            .classList
+            .add("hidden");
+        }
+    );
+
+}
+
+
+function showHome(){
+
+    hideSections();
+
+    document
+    .getElementById("home")
+    .classList
+    .remove("hidden");
+
+    renderHome();
+
+}
+
+
+function showLearn(){
+
+    hideSections();
+
+    document
+    .getElementById("learn")
+    .classList
+    .remove("hidden");
+
+    renderLearn();
+
+}
+
+
+function showLogin(){
+
+    hideSections();
+
+    document
+    .getElementById("login")
+    .classList
+    .remove("hidden");
+
+}
+
+
+/* =========================
+   CONNEXION
+========================= */
+
+function login(){
+
+    const first =
+        document
+        .getElementById(
+            "firstName"
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const last =
+        document
+        .getElementById(
+            "lastName"
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    if(
+        first==="ziyad" &&
+        last==="hamied"
+    ){
+
+        sessionStorage.setItem(
+            "adminConnected",
+            "true"
+        );
+
+        document
+        .getElementById(
+            "loginMessage"
+        )
+        .textContent="";
+
+        showAdmin();
+
+    }else{
+
+        document
+        .getElementById(
+            "loginMessage"
+        )
+        .className="no";
+
+        document
+        .getElementById(
+            "loginMessage"
+        )
+        .textContent=
+            "Identifiants incorrects.";
+
+    }
+
+}
+
+
+function showAdmin(){
+
+    if(
+        sessionStorage.getItem(
+            "adminConnected"
+        )!=="true"
+    ){
+
+        showLogin();
+
+        return;
+
+    }
+
+
+    hideSections();
+
+    document
+    .getElementById("admin")
+    .classList
+    .remove("hidden");
+
+
+    document
+    .getElementById(
+        "adminButton"
+    )
+    .innerHTML=
+        '<button onclick="showAdmin()">Administration</button>';
+
+
+    renderAdmin();
+
+}
+
+
+function logout(){
+
+    sessionStorage.removeItem(
+        "adminConnected"
+    );
+
+    document
+    .getElementById(
+        "adminButton"
+    )
+    .innerHTML="";
+
+    showHome();
+
+}
+
+
+/* =========================
+   ICONES
+========================= */
+
+function getIcon(item){
+
+    if(
+        item.type==="folder"
+    ){
+
+        return "📁";
+
+    }
+
+    if(
+        item.type==="exercise"
+    ){
+
+        return "📝";
+
+    }
+
+    return "📄";
+
+}
+
+
+/* =========================
+   FIL D'ARIANE
+========================= */
+
+function breadcrumb(
+    folderId,
+    functionName
+){
+
+    let html=
+        `<div class="breadcrumb">
+        <button onclick="${functionName}('')">
+        Accueil
+        </button>`;
+
+    const chain=[];
+
+    let current=
+        folderId;
+
+
+    while(current){
+
+        const item=
+            findItem(current);
+
+        if(!item){
+
+            break;
+
+        }
+
+        chain.unshift(item);
+
+        const parent=
+            findParent(current);
+
+        current=
+            parent
+            ? parent.id
+            : "";
+
+    }
+
+
+    chain.forEach(
+        item=>{
+
+            html+=
+            `<span>›</span>
+            <button onclick="${functionName}('${item.id}')">
+            ${escapeHtml(item.name)}
+            </button>`;
+
+        }
+    );
+
+
+    html+="</div>";
+
+    return html;
+
+}
+
+
+/* =========================
+   EXPLORATEUR PUBLIC
+========================= */
+
+function renderHome(){
+
+    renderPublicFolder("");
+
+}
+
+
+function openPublic(folderId){
+
+    const item=
+        folderId
+        ? findItem(folderId)
+        : null;
+
+
+    if(
+        item &&
+        item.type!=="folder"
+    ){
+
+        showItem(item);
+
+        return;
+
+    }
+
+
+    renderPublicFolder(
+        folderId
+    );
+
+}
+
+
+function renderPublicFolder(
+    folderId
+){
+
+    const container=
+        document
+        .getElementById(
+            "homeExplorer"
+        );
+
+
+    const items=
+        getItems(folderId);
+
+
+    let html=
+        breadcrumb(
+            folderId,
+            "openPublic"
+        );
+
+
+    if(items.length===0){
+
+        html+=
+        `<div class="notice">
+        Aucun fichier ici.
+        </div>`;
+
+    }else{
+
+        html+=
+        `<div class="file-grid">`;
+
+
+        items.forEach(
+            item=>{
+
+                html+=
+                `<div
+                    class="file"
+                    style="border-top:5px solid ${
+                        escapeAttr(
+                            item.color ||
+                            "#315bd6"
+                        )
+                    }"
+                    onclick="openPublic('${item.id}')"
+                >
+
+                    <div class="icon">
+                        ${getIcon(item)}
+                    </div>
+
+                    <div class="file-title">
+                        ${escapeHtml(item.name)}
+                    </div>
+
+                    <div class="muted">
+                        ${
+                            item.type==="folder"
+                            ? "Dossier"
+                            : item.type==="exercise"
+                            ? "Exercice"
+                            : "Mémo"
+                        }
+                    </div>
+
+                </div>`;
+
+            }
+        );
+
+
+        html+="</div>";
+
+    }
+
+
+    container.innerHTML=html;
+
+}
+
+
+/* =========================
+   AFFICHAGE D'UN ELEMENT
+========================= */
+
+function showItem(item){
+
+    const container=
+        document
+        .getElementById(
+            "homeExplorer"
+        );
+
+
+    let html=
+    `<div
+        class="card"
+        style="border-top:7px solid ${
+            escapeAttr(
+                item.color ||
+                "#315bd6"
+            )
+        }"
+    >
+
+        <div class="breadcrumb">
+
+            <button onclick="renderHome()">
+                Accueil
+            </button>
+
+        </div>
+
+        <h2>
+            ${escapeHtml(item.name)}
+        </h2>`;
+
+
+    if(
+        item.type==="memo"
+    ){
+
+        html+=
+        `<div class="memo">
+            ${escapeHtml(
+                item.text || ""
+            )}
+        </div>`;
+
+
+        if(item.image){
+
+            html+=
+            `<p>
+                <img
+                    src="${escapeAttr(item.image)}"
+                    alt=""
+                >
+            </p>`;
+
+        }
+
+
+        if(item.audio){
+
+            html+=
+            `<audio
+                controls
+                src="${escapeAttr(item.audio)}"
+            ></audio>`;
+
+        }
+
+    }
+
+
+    if(
+        item.type==="exercise"
+    ){
+
+        html+=
+        `<div class="exercise">
+
+            <strong>
+                📝 Exercice
+            </strong>
+
+            <p>
+                ${escapeHtml(
+                    item.question || ""
+                )}
+            </p>
+
+            <input
+                id="answer_${item.id}"
+                placeholder="Ta réponse"
+            >
+
+            <button
+                onclick="checkAnswer('${item.id}')"
+            >
+                Vérifier
+            </button>
+
+            <div
+                id="result_${item.id}"
+            ></div>
+
+        </div>`;
+
+    }
+
+
+    if(
+        item.type==="folder"
+    ){
+
+        html+=
+        `<div class="file-grid">`;
+
+
+        (
+            item.children || []
+        )
+        .forEach(
+            child=>{
+
+                html+=
+                `<div
+                    class="file"
+                    style="border-top:5px solid ${
+                        escapeAttr(
+                            child.color ||
+                            "#315bd6"
+                        )
+                    }"
+                    onclick="openPublic('${child.id}')"
+                >
+
+                    <div class="icon">
+                        ${getIcon(child)}
+                    </div>
+
+                    <div class="file-title">
+                        ${escapeHtml(
+                            child.name
+                        )}
+                    </div>
+
+                </div>`;
+
+            }
+        );
+
+
+        html+="</div>";
+
+    }
+
+
+    html+="</div>";
+
+    container.innerHTML=html;
+
+}
+
+
+/* =========================
+   APPRENDRE
+========================= */
+
+function renderLearn(){
+
+    document
+    .getElementById(
+        "learnExplorer"
+    )
+    .innerHTML=
+        breadcrumb(
+            currentFolder,
+            "openLearn"
+        )
+        +
+        `<div class="notice">
+        Les contenus créés ici apparaissent automatiquement dans Accueil.
+        </div>`;
+
+}
+
+
+function openLearn(folderId){
+
+    currentFolder=
+        folderId || "";
+
+    renderLearn();
+
+}
+
+
+/* =========================
+   ADMINISTRATEUR
+========================= */
+
+function renderAdmin(){
+
+    const container=
+        document
+        .getElementById(
+            "adminExplorer"
+        );
+
+
+    const items=
+        getItems(currentFolder);
+
+
+    let html=
+        breadcrumb(
+            currentFolder,
+            "adminOpen"
+        );
+
+
+    if(items.length===0){
+
+        html+=
+        `<div class="notice">
+        Ce dossier est vide.
+        </div>`;
+
+    }
+
+
+    items.forEach(
+        item=>{
+
+            html+=
+            `<div
+                class="admin-item"
+                style="--color:${
+                    escapeAttr(
+                        item.color ||
+                        "#315bd6"
+                    )
+                }"
+            >
+
+                <b>
+                    ${getIcon(item)}
+                    ${escapeHtml(item.name)}
+                </b>
+
+                <div class="muted">
+                    ${
+                        item.type==="folder"
+                        ? "Dossier"
+                        : item.type==="exercise"
+                        ? "Exercice"
+                        : "Mémo"
+                    }
+                </div>
+
+                <div class="actions">
+
+                    ${
+                        item.type==="folder"
+                        ?
+                        `
+                        <button
+                            onclick="adminOpen('${item.id}')"
+                        >
+                            Ouvrir
+                        </button>
+
+                        <button
+                            onclick="newItem('${item.id}')"
+                        >
+                            + Dedans
+                        </button>
+                        `
+                        :
+                        ""
+                    }
+
+                    <button
+                        class="secondary"
+                        onclick="editItem('${item.id}')"
+                    >
+                        Modifier
+                    </button>
+
+                    <button
+                        class="danger"
+                        onclick="deleteItem('${item.id}')"
+                    >
+                        Supprimer
+                    </button>
+
+                </div>
+
+            </div>`;
+
+        }
+    );
+
+
+    container.innerHTML=html;
+
+}
+
+
+function adminOpen(folderId){
+
+    const item=
+        folderId
+        ? findItem(folderId)
+        : null;
+
+
+    if(
+        item &&
+        item.type!=="folder"
+    ){
+
+        editItem(item.id);
+
+        return;
+
+    }
+
+
+    currentFolder=
+        folderId || "";
+
+    renderAdmin();
+
+}
+
+
+/* =========================
+   NOUVEAU
+========================= */
+
+function newItem(parentId){
+
+    openEditor(
+        null,
+        parentId || ""
+    );
+
+}
+
+
+function editItem(id){
+
+    const item=
+        findItem(id);
+
+    if(!item)return;
+
+
+    const parent=
+        findParent(id);
+
+
+    openEditor(
+        item,
+        parent
+        ? parent.id
+        : ""
+    );
+
+}
+
+
+/* =========================
+   EDITEUR
+========================= */
+
+function openEditor(
+    item,
+    parentId
+){
+
+    document
+    .getElementById(
+        "editor"
+    )
+    .classList
+    .remove("hidden");
+
+
+    document
+    .getElementById(
+        "editorTitle"
+    )
+    .textContent=
+        item
+        ? "Modifier"
+        : "Nouveau fichier";
+
+
+    document
+    .getElementById(
+        "editId"
+    )
+    .value=
+        item
+        ? item.id
+        : "";
+
+
+    document
+    .getElementById(
+        "editParent"
+    )
+    .value=
+        parentId;
+
+
+    document
+    .getElementById(
+        "itemName"
+    )
+    .value=
+        item
+        ? item.name
+        : "";
+
+
+    document
+    .getElementById(
+        "itemType"
+    )
+    .value=
+        item
+        ? item.type
+        : "folder";
+
+
+    document
+    .getElementById(
+        "itemColor"
+    )
+    .value=
+        item?.color ||
+        "#315bd6";
+
+
+    document
+    .getElementById(
+        "itemText"
+    )
+    .value=
+        item?.text ||
+        "";
+
+
+    document
+    .getElementById(
+        "itemImageUrl"
+    )
+    .value=
+        item?.image ||
+        "";
+
+
+    document
+    .getElementById(
+        "itemAudioUrl"
+    )
+    .value=
+        item?.audio ||
+        "";
+
+
+    document
+    .getElementById(
+        "question"
+    )
+    .value=
+        item?.question ||
+        "";
+
+
+    document
+    .getElementById(
+        "answer"
+    )
+    .value=
+        item?.answer ||
+        "";
+
+
+    document
+    .getElementById(
+        "itemImageFile"
+    )
+    .value="";
+
+
+    document
+    .getElementById(
+        "itemAudioFile"
+    )
+    .value="";
+
+
+    changeType();
+
+    updateColor();
+
+
+    document
+    .getElementById(
+        "editor"
+    )
+    .scrollIntoView({
+        behavior:"smooth"
+    });
+
+}
+
+
+function closeEditor(){
+
+    document
+    .getElementById(
+        "editor"
+    )
+    .classList
+    .add("hidden");
+
+}
+
+
+function changeType(){
+
+    const type=
+        document
+        .getElementById(
+            "itemType"
+        )
+        .value;
+
+
+    document
+    .getElementById(
+        "memoFields"
+    )
+    .classList
+    .toggle(
+        "hidden",
+        type!=="memo"
+    );
+
+
+    document
+    .getElementById(
+        "exerciseFields"
+    )
+    .classList
+    .toggle(
+        "hidden",
+        type!=="exercise"
+    );
+
+}
+
+
+function updateColor(){
+
+    document
+    .getElementById(
+        "colorPreview"
+    )
+    .style
+    .background=
+        document
+        .getElementById(
+            "itemColor"
+        )
+        .value;
+
+}
+
+
+/* =========================
+   FICHIERS
+========================= */
+
+function readFile(input){
+
+    return new Promise(
+        resolve=>{
+
+            const file=
+                input.files[0];
+
+
+            if(!file){
+
+                resolve("");
+
+                return;
+
+            }
+
+
+            const reader=
+                new FileReader();
+
+
+            reader.onload=
+                ()=>{
+                    resolve(
+                        reader.result
+                    );
+                };
+
+
+            reader.onerror=
+                ()=>{
+                    resolve("");
+                };
+
+
+            reader.readAsDataURL(file);
+
+        }
+    );
+
+}
+
+
+/* =========================
+   ENREGISTRER
+========================= */
+
+async function saveItem(){
+
+    const name=
+        document
+        .getElementById(
+            "itemName"
+        )
+        .value
+        .trim();
+
+
+    if(!name){
+
+        alert(
+            "Donne un nom."
+        );
+
+        return;
+
+    }
+
+
+    const id=
+        document
+        .getElementById(
+            "editId"
+        )
+        .value;
+
+
+    const parentId=
+        document
+        .getElementById(
+            "editParent"
+        )
+        .value;
+
+
+    const type=
+        document
+        .getElementById(
+            "itemType"
+        )
+        .value;
+
+
+    let item=
+        id
+        ? findItem(id)
+        : null;
+
+
+    if(!item){
+
+        item={
+            id:createId(),
+            name:"",
+            type:"folder",
+            color:"#315bd6",
+            children:[]
+        };
+
+
+        getItems(parentId)
+        .push(item);
+
+    }
+
+
+    item.name=name;
+
+    item.type=type;
+
+    item.color=
+        document
+        .getElementById(
+            "itemColor"
+        )
+        .value;
+
+
+    if(type==="folder"){
+
+        if(!item.children){
+
+            item.children=[];
+
+        }
+
+        delete item.text;
+        delete item.image;
+        delete item.audio;
+        delete item.question;
+        delete item.answer;
+
+    }
+
+
+    if(type==="memo"){
+
+        item.text=
+            document
+            .getElementById(
+                "itemText"
+            )
+            .value;
+
+
+        const image=
+            await readFile(
+                document
+                .getElementById(
+                    "itemImageFile"
+                )
+            );
+
+
+        item.image=
+            image ||
+            document
+            .getElementById(
+                "itemImageUrl"
+            )
+            .value
+            .trim();
+
+
+        const audio=
+            await readFile(
+                document
+                .getElementById(
+                    "itemAudioFile"
+                )
+            );
+
+
+        item.audio=
+            audio ||
+            document
+            .getElementById(
+                "itemAudioUrl"
+            )
+            .value
+            .trim();
+
+
+        delete item.question;
+        delete item.answer;
+
+    }
+
+
+    if(type==="exercise"){
+
+        item.question=
+            document
+            .getElementById(
+                "question"
+            )
+            .value;
+
+
+        item.answer=
+            document
+            .getElementById(
+                "answer"
+            )
+            .value;
+
+
+        delete item.text;
+        delete item.image;
+        delete item.audio;
+
+    }
+
+
+    persist();
+
+    closeEditor();
+
+    renderAdmin();
+
+    renderHome();
+
+    renderLearn();
+
+}
+
+
+/* =========================
+   SUPPRIMER
+========================= */
+
+function deleteItem(id){
+
+    const item=
+        findItem(id);
+
+
+    if(!item)return;
+
+
+    if(
+        !confirm(
+            "Supprimer cet élément et tout son contenu ?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    const parent=
+        findParent(id);
+
+
+    const array=
+        parent
+        ? parent.children
+        : data.items;
+
+
+    const index=
+        array.findIndex(
+            x=>x.id===id
+        );
+
+
+    if(index>=0){
+
+        array.splice(
+            index,
+            1
+        );
+
+    }
+
+
+    persist();
+
+    renderAdmin();
+
+    renderHome();
+
+    renderLearn();
+
+}
+
+
+/* =========================
+   EXERCICE
+========================= */
+
+function checkAnswer(id){
+
+    const item=
+        findItem(id);
+
+
+    const value=
+        document
+        .getElementById(
+            "answer_"+id
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const expected=
+        (
+            item.answer ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    const result=
+        document
+        .getElementById(
+            "result_"+id
+        );
+
+
+    if(
+        value &&
+        value===expected
+    ){
+
+        result.className=
+            "result ok";
+
+        result.textContent=
+            "Bravo ! Bonne réponse.";
+
+    }else{
+
+        result.className=
+            "result no";
+
+        result.textContent=
+            "Essaie encore !";
+
+    }
+
+}
+
+
+/* =========================
+   EXPORT
+========================= */
+
+function exportData(){
+
+    const blob=
+        new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+
+    const url=
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link=
+        document.createElement(
+            "a"
+        );
+
+
+    link.href=url;
+
+    link.download=
+        "sauvegarde-apprendre.json";
+
+    link.click();
+
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+/* =========================
+   IMPORT
+========================= */
+
+function importData(event){
+
+    const file=
+        event.target.files[0];
+
+
+    if(!file)return;
+
+
+    const reader=
+        new FileReader();
+
+
+    reader.onload=()=>{
+
+        try{
+
+            const imported=
+                JSON.parse(
+                    reader.result
+                );
+
+
+            if(
+                !imported ||
+                !Array.isArray(
+                    imported.items
+                )
+            ){
+
+                throw new Error();
+
+            }
+
+
+            data=imported;
+
+            persist();
+
+            renderAdmin();
+
+            renderHome();
+
+            renderLearn();
+
+            alert(
+                "Import terminé."
+            );
+
+        }catch(e){
+
+            alert(
+                "Fichier invalide."
+            );
+
+        }
+
+    };
+
+
+    reader.readAsText(file);
+
+}
+
+
+/* =========================
+   SECURITE AFFICHAGE
+========================= */
+
+function escapeHtml(value){
+
+    return String(
+        value ?? ""
+    ).replace(
+        /[&<>"']/g,
+        character=>({
+
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#39;"
+
+        }[character])
+    );
+
+}
+
+
+function escapeAttr(value){
+
+    return escapeHtml(value);
+
+}
+
+
+/* =========================
+   DEMARRAGE
+========================= */
+
+if(
+    sessionStorage.getItem(
+        "adminConnected"
+    )==="true"
+){
+
+    document
+    .getElementById(
+        "adminButton"
+    )
+    .innerHTML=
+        '<button onclick="showAdmin()">Administration</button>';
+
+}
+
+
+renderHome();
+
+</script>
+
+</body>
+</html>

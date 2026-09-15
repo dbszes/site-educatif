@@ -4,7 +4,8 @@
    SUPABASE
 ========================================================= */
 
-const SUPABASE_URL = "https://eumfudusjqcjbsukxcyv.supabase.co";
+const SUPABASE_URL =
+    "https://eumfudusjqcjbsukxcyv.supabase.co";
 
 const SUPABASE_KEY =
     "sb_publishable_e9J4xKfdIbIM2STAI4lReQ_Ks-d8owd";
@@ -19,7 +20,7 @@ let supabaseClient = null;
 const ADMIN_FIRST_NAME = "Ziyad";
 const ADMIN_LAST_NAME = "Hamied";
 
-const ADMIN_SESSION_KEY = "mini_ordinateur_admin";
+let isAdmin = false;
 
 
 /* =========================================================
@@ -28,27 +29,35 @@ const ADMIN_SESSION_KEY = "mini_ordinateur_admin";
 
 let items = [];
 let currentFolder = null;
-let isAdmin = false;
 
 
 /* =========================================================
-   INITIALISATION
+   INITIALISATION SUPABASE
 ========================================================= */
 
 function initSupabase() {
+
     if (
         window.supabase &&
         typeof window.supabase.createClient === "function"
     ) {
+
         try {
-            supabaseClient = window.supabase.createClient(
-                SUPABASE_URL,
-                SUPABASE_KEY
-            );
+
+            supabaseClient =
+                window.supabase.createClient(
+                    SUPABASE_URL,
+                    SUPABASE_KEY
+                );
 
             return true;
+
         } catch (error) {
-            console.error("Erreur Supabase :", error);
+
+            console.error(
+                "Erreur Supabase :",
+                error
+            );
         }
     }
 
@@ -60,21 +69,79 @@ function initSupabase() {
    DÉMARRAGE
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
 
-    initSupabase();
+        initSupabase();
 
-    isAdmin =
-        sessionStorage.getItem(ADMIN_SESSION_KEY) === "true";
+        await checkAdminSession();
 
-    updateInterface();
+        updateInterface();
 
-    showHome();
+        showHome();
 
-    await loadItems();
+        await loadItems();
 
-    setupRealtime();
-});
+        setupRealtime();
+    }
+);
+
+
+/* =========================================================
+   VÉRIFICATION DE LA SESSION ADMIN
+========================================================= */
+
+async function checkAdminSession() {
+
+    isAdmin = false;
+
+    if (!supabaseClient) {
+        return;
+    }
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient.auth.getSession();
+
+        if (error) {
+            throw error;
+        }
+
+        const session = data?.session;
+
+        if (!session?.user) {
+            return;
+        }
+
+        const result =
+            await supabaseClient
+                .from("admins")
+                .select("user_id")
+                .eq("user_id", session.user.id)
+                .maybeSingle();
+
+        if (result.error) {
+            throw result.error;
+        }
+
+        if (result.data) {
+            isAdmin = true;
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Erreur vérification Admin :",
+            error
+        );
+
+        isAdmin = false;
+    }
+}
 
 
 /* =========================================================
@@ -86,6 +153,7 @@ function hideAllSections() {
     document
         .querySelectorAll("main > section")
         .forEach(function (section) {
+
             section.classList.add("hidden");
         });
 }
@@ -95,7 +163,8 @@ function showHome() {
 
     hideAllSections();
 
-    const section = document.getElementById("home");
+    const section =
+        document.getElementById("home");
 
     if (section) {
         section.classList.remove("hidden");
@@ -113,7 +182,8 @@ function showLearn() {
 
     hideAllSections();
 
-    const section = document.getElementById("learn");
+    const section =
+        document.getElementById("learn");
 
     if (section) {
         section.classList.remove("hidden");
@@ -131,7 +201,8 @@ function showLogin() {
 
     hideAllSections();
 
-    const section = document.getElementById("login");
+    const section =
+        document.getElementById("login");
 
     if (section) {
         section.classList.remove("hidden");
@@ -144,13 +215,16 @@ function showLogin() {
 function showAdmin() {
 
     if (!isAdmin) {
+
         showLogin();
+
         return;
     }
 
     hideAllSections();
 
-    const section = document.getElementById("admin");
+    const section =
+        document.getElementById("admin");
 
     if (section) {
         section.classList.remove("hidden");
@@ -168,7 +242,8 @@ function showAdmin() {
 
 function setSiteTitle(title) {
 
-    const element = document.getElementById("siteTitle");
+    const element =
+        document.getElementById("siteTitle");
 
     if (element) {
         element.textContent = title;
@@ -207,26 +282,44 @@ function updateInterface() {
 
 
 /* =========================================================
-   CONNEXION
+   CONNEXION ADMIN
 ========================================================= */
 
-function login() {
+async function login() {
 
-    const firstName =
-        document.getElementById("firstName")?.value.trim() || "";
-
-    const lastName =
-        document.getElementById("lastName")?.value.trim() || "";
-
-    if (!firstName || !lastName) {
+    if (!supabaseClient) {
 
         showLoginMessage(
-            "Veuillez remplir les deux champs.",
+            "Supabase n'est pas disponible.",
             false
         );
 
         return;
     }
+
+    const firstName =
+        document
+            .getElementById("firstName")
+            ?.value
+            .trim() || "";
+
+    const lastName =
+        document
+            .getElementById("lastName")
+            ?.value
+            .trim() || "";
+
+
+    if (!firstName || !lastName) {
+
+        showLoginMessage(
+            "Veuillez remplir le prénom et le nom.",
+            false
+        );
+
+        return;
+    }
+
 
     if (
         firstName.toLowerCase() !==
@@ -243,30 +336,139 @@ function login() {
         return;
     }
 
-    isAdmin = true;
 
-    sessionStorage.setItem(
-        ADMIN_SESSION_KEY,
-        "true"
-    );
+    /*
+       Ton index.html actuel ne possède pas encore
+       de champ e-mail/mot de passe.
 
-    updateInterface();
+       On les demande donc temporairement avec
+       deux petites fenêtres.
+    */
+
+    const email =
+        prompt(
+            "Adresse e-mail de ton compte Supabase :"
+        );
+
+    if (!email) {
+        return;
+    }
+
+
+    const password =
+        prompt(
+            "Mot de passe de ton compte Supabase :"
+        );
+
+    if (!password) {
+        return;
+    }
+
 
     showLoginMessage(
-        "Connexion réussie !",
+        "Connexion en cours...",
         true
     );
 
-    setTimeout(function () {
-        showAdmin();
-    }, 400);
+
+    try {
+
+        const result =
+            await supabaseClient.auth.signInWithPassword({
+                email: email.trim(),
+                password: password
+            });
+
+
+        if (result.error) {
+            throw result.error;
+        }
+
+
+        const user =
+            result.data?.user;
+
+
+        if (!user) {
+
+            throw new Error(
+                "Utilisateur introuvable."
+            );
+        }
+
+
+        /*
+           On vérifie que le compte connecté
+           est bien dans la table admins.
+        */
+
+        const adminResult =
+            await supabaseClient
+                .from("admins")
+                .select("user_id")
+                .eq("user_id", user.id)
+                .maybeSingle();
+
+
+        if (adminResult.error) {
+            throw adminResult.error;
+        }
+
+
+        if (!adminResult.data) {
+
+            await supabaseClient.auth.signOut();
+
+            throw new Error(
+                "Ce compte n'est pas autorisé comme Admin."
+            );
+        }
+
+
+        isAdmin = true;
+
+        updateInterface();
+
+        showLoginMessage(
+            "Connexion réussie !",
+            true
+        );
+
+
+        setTimeout(function () {
+
+            showAdmin();
+
+        }, 300);
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur de connexion :",
+            error
+        );
+
+        isAdmin = false;
+
+        showLoginMessage(
+            "Connexion impossible : " +
+            error.message,
+            false
+        );
+    }
 }
 
 
-function showLoginMessage(text, success) {
+function showLoginMessage(
+    text,
+    success
+) {
 
     const message =
-        document.getElementById("loginMessage");
+        document.getElementById(
+            "loginMessage"
+        );
 
     if (!message) {
         return;
@@ -274,7 +476,10 @@ function showLoginMessage(text, success) {
 
     message.textContent = text;
 
-    message.classList.remove("ok", "no");
+    message.classList.remove(
+        "ok",
+        "no"
+    );
 
     message.classList.add(
         success ? "ok" : "no"
@@ -286,13 +491,24 @@ function showLoginMessage(text, success) {
    DÉCONNEXION
 ========================================================= */
 
-function logout() {
+async function logout() {
+
+    try {
+
+        if (supabaseClient) {
+            await supabaseClient.auth.signOut();
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Erreur déconnexion :",
+            error
+        );
+    }
+
 
     isAdmin = false;
-
-    sessionStorage.removeItem(
-        ADMIN_SESSION_KEY
-    );
 
     closeEditor();
 
@@ -318,28 +534,38 @@ async function loadItems() {
         return;
     }
 
+
     try {
 
         const result =
             await supabaseClient
                 .from("items")
                 .select("*")
-                .order("created_at", {
-                    ascending: true
-                });
+                .order(
+                    "created_at",
+                    {
+                        ascending: true
+                    }
+                );
+
 
         if (result.error) {
             throw result.error;
         }
 
-        items = result.data || [];
+
+        items =
+            result.data || [];
+
 
         renderHome();
         renderLearn();
 
+
         if (isAdmin) {
             renderAdmin();
         }
+
 
     } catch (error) {
 
@@ -362,21 +588,23 @@ async function loadItems() {
 
 function getChildren(parentId) {
 
-    return items.filter(function (item) {
+    return items.filter(
+        function (item) {
 
-        return item.parent_id === parentId;
-
-    });
+            return item.parent_id === parentId;
+        }
+    );
 }
 
 
 function getItem(id) {
 
-    return items.find(function (item) {
+    return items.find(
+        function (item) {
 
-        return item.id === id;
-
-    });
+            return item.id === id;
+        }
+    );
 }
 
 
@@ -384,7 +612,9 @@ function getPath(folderId) {
 
     const path = [];
 
-    let current = getItem(folderId);
+    let current =
+        getItem(folderId);
+
 
     while (current) {
 
@@ -394,7 +624,8 @@ function getPath(folderId) {
             break;
         }
 
-        current = getItem(current.parent_id);
+        current =
+            getItem(current.parent_id);
     }
 
     return path;
@@ -430,11 +661,14 @@ function getIcon(type) {
 function renderHome() {
 
     const container =
-        document.getElementById("homeExplorer");
+        document.getElementById(
+            "homeExplorer"
+        );
 
     if (!container) {
         return;
     }
+
 
     if (currentFolder) {
 
@@ -446,7 +680,10 @@ function renderHome() {
         return;
     }
 
-    const roots = getChildren(null);
+
+    const roots =
+        getChildren(null);
+
 
     if (roots.length === 0) {
 
@@ -459,11 +696,14 @@ function renderHome() {
         return;
     }
 
+
     container.innerHTML = `
         <div class="file-grid">
             ${roots
                 .map(function (item) {
+
                     return publicFileHTML(item);
+
                 })
                 .join("")}
         </div>
@@ -481,7 +721,9 @@ function publicFileHTML(item) {
                     item.color || "#315bd6"
                 )
             }"
-            onclick="openPublicItem('${escapeAttribute(item.id)}')"
+            onclick="openPublicItem('${escapeAttribute(
+                item.id
+            )}')"
         >
 
             <div class="icon">
@@ -499,11 +741,13 @@ function publicFileHTML(item) {
 
 function openPublicItem(id) {
 
-    const item = getItem(id);
+    const item =
+        getItem(id);
 
     if (!item) {
         return;
     }
+
 
     if (item.type === "folder") {
 
@@ -514,6 +758,7 @@ function openPublicItem(id) {
         return;
     }
 
+
     openPublicContent(item);
 }
 
@@ -522,9 +767,14 @@ function openPublicItem(id) {
    DOSSIERS PUBLICS
 ========================================================= */
 
-function renderPublicFolder(container, folderId) {
+function renderPublicFolder(
+    container,
+    folderId
+) {
 
-    const folder = getItem(folderId);
+    const folder =
+        getItem(folderId);
+
 
     if (!folder) {
 
@@ -535,8 +785,13 @@ function renderPublicFolder(container, folderId) {
         return;
     }
 
-    const children = getChildren(folderId);
-    const path = getPath(folderId);
+
+    const children =
+        getChildren(folderId);
+
+    const path =
+        getPath(folderId);
+
 
     container.innerHTML = `
 
@@ -556,7 +811,9 @@ function renderPublicFolder(container, folderId) {
                             onclick="openPublicItem('${escapeAttribute(
                                 folderItem.id
                             )}')">
-                            ${escapeHTML(folderItem.name)}
+                            ${escapeHTML(
+                                folderItem.name
+                            )}
                         </button>
                     `;
 
@@ -576,7 +833,9 @@ function renderPublicFolder(container, folderId) {
                     <div class="file-grid">
                         ${children
                             .map(function (item) {
+
                                 return publicFileHTML(item);
+
                             })
                             .join("")}
                     </div>
@@ -601,16 +860,20 @@ function goHomeExplorer() {
 function openPublicContent(item) {
 
     const container =
-        document.getElementById("homeExplorer");
+        document.getElementById(
+            "homeExplorer"
+        );
 
     if (!container) {
         return;
     }
 
+
     const path =
         item.parent_id
             ? getPath(item.parent_id)
             : [];
+
 
     let html = `
 
@@ -630,7 +893,9 @@ function openPublicContent(item) {
                             onclick="openPublicItem('${escapeAttribute(
                                 folder.id
                             )}')">
-                            ${escapeHTML(folder.name)}
+                            ${escapeHTML(
+                                folder.name
+                            )}
                         </button>
                     `;
 
@@ -740,6 +1005,7 @@ function openPublicContent(item) {
         `;
     }
 
+
     container.innerHTML = html;
 }
 
@@ -750,33 +1016,48 @@ function openPublicContent(item) {
 
 function checkExercise(id) {
 
-    const item = getItem(id);
+    const item =
+        getItem(id);
 
     if (!item) {
         return;
     }
 
+
     const input =
-        document.getElementById("exerciseAnswer");
+        document.getElementById(
+            "exerciseAnswer"
+        );
 
     const result =
-        document.getElementById("exerciseResult");
+        document.getElementById(
+            "exerciseResult"
+        );
+
 
     if (!input || !result) {
         return;
     }
 
+
     const userAnswer =
-        normalizeAnswer(input.value);
+        normalizeAnswer(
+            input.value
+        );
+
 
     const correctAnswer =
-        normalizeAnswer(item.answer || "");
+        normalizeAnswer(
+            item.answer || ""
+        );
+
 
     result.classList.remove(
         "hidden",
         "ok",
         "no"
     );
+
 
     if (
         userAnswer !== "" &&
@@ -818,13 +1099,18 @@ function normalizeAnswer(value) {
 function renderLearn() {
 
     const container =
-        document.getElementById("learnExplorer");
+        document.getElementById(
+            "learnExplorer"
+        );
 
     if (!container) {
         return;
     }
 
-    const roots = getChildren(null);
+
+    const roots =
+        getChildren(null);
+
 
     if (roots.length === 0) {
 
@@ -837,12 +1123,15 @@ function renderLearn() {
         return;
     }
 
+
     container.innerHTML = `
         <div class="file-grid">
 
             ${roots
                 .map(function (item) {
+
                     return publicFileHTML(item);
+
                 })
                 .join("")}
 
@@ -861,25 +1150,33 @@ function renderAdmin() {
         return;
     }
 
+
     const container =
-        document.getElementById("adminExplorer");
+        document.getElementById(
+            "adminExplorer"
+        );
 
     if (!container) {
         return;
     }
 
+
     const children =
         getChildren(currentFolder);
+
 
     const path =
         currentFolder
             ? getPath(currentFolder)
             : [];
 
+
     const title =
         currentFolder
-            ? getItem(currentFolder)?.name || "Dossier"
+            ? getItem(currentFolder)?.name ||
+              "Dossier"
             : "Accueil";
+
 
     container.innerHTML = `
 
@@ -899,7 +1196,9 @@ function renderAdmin() {
                             onclick="openAdminFolder('${escapeAttribute(
                                 folder.id
                             )}')">
-                            ${escapeHTML(folder.name)}
+                            ${escapeHTML(
+                                folder.name
+                            )}
                         </button>
                     `;
 
@@ -921,7 +1220,9 @@ function renderAdmin() {
                 `
                 : children
                     .map(function (item) {
+
                         return adminItemHTML(item);
+
                     })
                     .join("")
         }
@@ -1001,7 +1302,7 @@ function adminItemHTML(item) {
 
 
 /* =========================================================
-   ADMIN NAVIGATION
+   NAVIGATION ADMIN
 ========================================================= */
 
 function adminGoHome() {
@@ -1020,11 +1321,18 @@ function openAdminFolder(id) {
         return;
     }
 
-    const item = getItem(id);
 
-    if (!item || item.type !== "folder") {
+    const item =
+        getItem(id);
+
+
+    if (
+        !item ||
+        item.type !== "folder"
+    ) {
         return;
     }
+
 
     currentFolder = id;
 
@@ -1047,35 +1355,53 @@ function newItem(parentId = null) {
         return;
     }
 
+
     currentFolder =
         parentId !== null
             ? parentId
             : currentFolder;
 
+
     clearEditor();
 
+
     const editParent =
-        document.getElementById("editParent");
+        document.getElementById(
+            "editParent"
+        );
+
 
     if (editParent) {
+
         editParent.value =
             currentFolder || "";
     }
 
+
     const editorTitle =
-        document.getElementById("editorTitle");
+        document.getElementById(
+            "editorTitle"
+        );
+
 
     if (editorTitle) {
+
         editorTitle.textContent =
             "Nouveau fichier";
     }
 
+
     const editor =
-        document.getElementById("editor");
+        document.getElementById(
+            "editor"
+        );
+
 
     if (editor) {
 
-        editor.classList.remove("hidden");
+        editor.classList.remove(
+            "hidden"
+        );
 
         changeType();
 
@@ -1098,37 +1424,91 @@ function editItem(id) {
         return;
     }
 
-    const item = getItem(id);
+
+    const item =
+        getItem(id);
+
 
     if (!item) {
         return;
     }
 
-    setInputValue("editId", item.id);
-    setInputValue("editParent", item.parent_id || "");
-    setInputValue("itemName", item.name || "");
-    setInputValue("itemType", item.type || "folder");
-    setInputValue("itemColor", item.color || "#315bd6");
-    setInputValue("itemText", item.text_content || "");
-    setInputValue("itemImageUrl", item.image_url || "");
-    setInputValue("itemAudioUrl", item.audio_url || "");
-    setInputValue("question", item.question || "");
-    setInputValue("answer", item.answer || "");
+
+    setInputValue(
+        "editId",
+        item.id
+    );
+
+    setInputValue(
+        "editParent",
+        item.parent_id || ""
+    );
+
+    setInputValue(
+        "itemName",
+        item.name || ""
+    );
+
+    setInputValue(
+        "itemType",
+        item.type || "folder"
+    );
+
+    setInputValue(
+        "itemColor",
+        item.color || "#315bd6"
+    );
+
+    setInputValue(
+        "itemText",
+        item.text_content || ""
+    );
+
+    setInputValue(
+        "itemImageUrl",
+        item.image_url || ""
+    );
+
+    setInputValue(
+        "itemAudioUrl",
+        item.audio_url || ""
+    );
+
+    setInputValue(
+        "question",
+        item.question || ""
+    );
+
+    setInputValue(
+        "answer",
+        item.answer || ""
+    );
+
 
     const editorTitle =
-        document.getElementById("editorTitle");
+        document.getElementById(
+            "editorTitle"
+        );
+
 
     if (editorTitle) {
+
         editorTitle.textContent =
             "Modifier";
     }
 
+
     const editor =
-        document.getElementById("editor");
+        document.getElementById(
+            "editor"
+        );
+
 
     if (editor) {
 
-        editor.classList.remove("hidden");
+        editor.classList.remove(
+            "hidden"
+        );
 
         changeType();
 
@@ -1141,7 +1521,10 @@ function editItem(id) {
 }
 
 
-function setInputValue(id, value) {
+function setInputValue(
+    id,
+    value
+) {
 
     const element =
         document.getElementById(id);
@@ -1153,7 +1536,7 @@ function setInputValue(id, value) {
 
 
 /* =========================================================
-   EDITEUR
+   ÉDITEUR
 ========================================================= */
 
 function clearEditor() {
@@ -1177,29 +1560,45 @@ function clearEditor() {
         }
     });
 
+
     const type =
-        document.getElementById("itemType");
+        document.getElementById(
+            "itemType"
+        );
+
 
     if (type) {
         type.value = "folder";
     }
 
+
     const color =
-        document.getElementById("itemColor");
+        document.getElementById(
+            "itemColor"
+        );
+
 
     if (color) {
         color.value = "#315bd6";
     }
 
+
     const imageFile =
-        document.getElementById("itemImageFile");
+        document.getElementById(
+            "itemImageFile"
+        );
+
 
     if (imageFile) {
         imageFile.value = "";
     }
 
+
     const audioFile =
-        document.getElementById("itemAudioFile");
+        document.getElementById(
+            "itemAudioFile"
+        );
+
 
     if (audioFile) {
         audioFile.value = "";
@@ -1210,10 +1609,15 @@ function clearEditor() {
 function closeEditor() {
 
     const editor =
-        document.getElementById("editor");
+        document.getElementById(
+            "editor"
+        );
 
     if (editor) {
-        editor.classList.add("hidden");
+
+        editor.classList.add(
+            "hidden"
+        );
     }
 }
 
@@ -1221,13 +1625,22 @@ function closeEditor() {
 function changeType() {
 
     const type =
-        document.getElementById("itemType")?.value;
+        document.getElementById(
+            "itemType"
+        )?.value;
+
 
     const memoFields =
-        document.getElementById("memoFields");
+        document.getElementById(
+            "memoFields"
+        );
+
 
     const exerciseFields =
-        document.getElementById("exerciseFields");
+        document.getElementById(
+            "exerciseFields"
+        );
+
 
     if (memoFields) {
 
@@ -1236,6 +1649,7 @@ function changeType() {
             type !== "memo"
         );
     }
+
 
     if (exerciseFields) {
 
@@ -1250,20 +1664,28 @@ function changeType() {
 function updateColor() {
 
     const color =
-        document.getElementById("itemColor")?.value ||
+        document.getElementById(
+            "itemColor"
+        )?.value ||
         "#315bd6";
 
+
     const preview =
-        document.getElementById("colorPreview");
+        document.getElementById(
+            "colorPreview"
+        );
+
 
     if (preview) {
-        preview.style.background = color;
+
+        preview.style.background =
+            color;
     }
 }
 
 
 /* =========================================================
-   SAUVEGARDER
+   SAUVEGARDE
 ========================================================= */
 
 async function saveItem() {
@@ -1275,6 +1697,7 @@ async function saveItem() {
         return;
     }
 
+
     if (!supabaseClient) {
 
         alert(
@@ -1284,29 +1707,77 @@ async function saveItem() {
         return;
     }
 
-    const id =
-        document.getElementById("editId")?.value.trim() || "";
 
-    const parentId =
-        document.getElementById("editParent")?.value.trim() ||
-        null;
+    /*
+       On vérifie encore la vraie session Supabase
+       avant d'envoyer la création.
+    */
 
-    const name =
-        document.getElementById("itemName")?.value.trim() || "";
+    const {
+        data: sessionData
+    } =
+        await supabaseClient.auth.getSession();
 
-    const type =
-        document.getElementById("itemType")?.value;
 
-    const color =
-        document.getElementById("itemColor")?.value ||
-        "#315bd6";
+    if (!sessionData?.session?.user) {
 
-    if (!name) {
+        isAdmin = false;
 
-        alert("Veuillez donner un nom.");
+        updateInterface();
+
+        alert(
+            "Ta session Admin a expiré. Reconnecte-toi."
+        );
+
+        showLogin();
 
         return;
     }
+
+
+    const id =
+        document
+            .getElementById("editId")
+            ?.value
+            .trim() || "";
+
+
+    const parentId =
+        document
+            .getElementById("editParent")
+            ?.value
+            .trim() || null;
+
+
+    const name =
+        document
+            .getElementById("itemName")
+            ?.value
+            .trim() || "";
+
+
+    const type =
+        document
+            .getElementById("itemType")
+            ?.value;
+
+
+    const color =
+        document
+            .getElementById("itemColor")
+            ?.value ||
+        "#315bd6";
+
+
+    if (!name) {
+
+        alert(
+            "Veuillez donner un nom."
+        );
+
+        return;
+    }
+
 
     const data = {
 
@@ -1320,33 +1791,45 @@ async function saveItem() {
 
         text_content:
             type === "memo"
-                ? getInputValue("itemText") || null
+                ? getInputValue(
+                    "itemText"
+                ) || null
                 : null,
 
         image_url:
             type === "memo"
-                ? getInputValue("itemImageUrl") || null
+                ? getInputValue(
+                    "itemImageUrl"
+                ) || null
                 : null,
 
         audio_url:
             type === "memo"
-                ? getInputValue("itemAudioUrl") || null
+                ? getInputValue(
+                    "itemAudioUrl"
+                ) || null
                 : null,
 
         question:
             type === "exercise"
-                ? getInputValue("question") || null
+                ? getInputValue(
+                    "question"
+                ) || null
                 : null,
 
         answer:
             type === "exercise"
-                ? getInputValue("answer") || null
+                ? getInputValue(
+                    "answer"
+                ) || null
                 : null
     };
+
 
     try {
 
         let result;
+
 
         if (id) {
 
@@ -1368,9 +1851,11 @@ async function saveItem() {
                     .single();
         }
 
+
         if (result.error) {
             throw result.error;
         }
+
 
         closeEditor();
 
@@ -1378,14 +1863,22 @@ async function saveItem() {
 
         renderAdmin();
 
-        alert("Enregistré avec succès !");
+
+        alert(
+            "✅ Enregistré avec succès !"
+        );
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Erreur sauvegarde :",
+            error
+        );
+
 
         alert(
-            "Impossible d'enregistrer.\n\n" +
+            "❌ Impossible d'enregistrer.\n\n" +
             error.message
         );
     }
@@ -1409,15 +1902,22 @@ function getInputValue(id) {
 
 async function deleteItem(id) {
 
-    if (!isAdmin || !supabaseClient) {
+    if (
+        !isAdmin ||
+        !supabaseClient
+    ) {
         return;
     }
 
-    const item = getItem(id);
+
+    const item =
+        getItem(id);
+
 
     if (!item) {
         return;
     }
+
 
     if (
         !confirm(
@@ -1428,6 +1928,7 @@ async function deleteItem(id) {
         return;
     }
 
+
     try {
 
         const result =
@@ -1436,21 +1937,26 @@ async function deleteItem(id) {
                 .delete()
                 .eq("id", id);
 
+
         if (result.error) {
             throw result.error;
         }
+
 
         if (currentFolder === id) {
             currentFolder = null;
         }
 
+
         await loadItems();
 
         renderAdmin();
 
+
     } catch (error) {
 
         console.error(error);
+
 
         alert(
             "Impossible de supprimer.\n\n" +
@@ -1466,19 +1972,26 @@ async function deleteItem(id) {
 
 function previewItem(id) {
 
-    const item = getItem(id);
+    const item =
+        getItem(id);
+
 
     if (!item) {
         return;
     }
 
+
     currentFolder =
         item.parent_id || null;
 
+
     showHome();
 
+
     setTimeout(function () {
+
         openPublicContent(item);
+
     }, 50);
 }
 
@@ -1492,6 +2005,7 @@ function setupRealtime() {
     if (!supabaseClient) {
         return;
     }
+
 
     try {
 
@@ -1511,6 +2025,7 @@ function setupRealtime() {
                 }
             )
             .subscribe();
+
 
     } catch (error) {
 
@@ -1532,8 +2047,14 @@ function exportData() {
         return;
     }
 
+
     const json =
-        JSON.stringify(items, null, 2);
+        JSON.stringify(
+            items,
+            null,
+            2
+        );
+
 
     const blob =
         new Blob(
@@ -1543,22 +2064,28 @@ function exportData() {
             }
         );
 
+
     const url =
         URL.createObjectURL(blob);
+
 
     const link =
         document.createElement("a");
 
+
     link.href = url;
+
 
     link.download =
         "mini-ordinateur-educatif.json";
+
 
     document.body.appendChild(link);
 
     link.click();
 
     link.remove();
+
 
     URL.revokeObjectURL(url);
 }
@@ -1570,30 +2097,44 @@ function exportData() {
 
 async function importData(event) {
 
-    if (!isAdmin || !supabaseClient) {
+    if (
+        !isAdmin ||
+        !supabaseClient
+    ) {
         return;
     }
+
 
     const file =
         event.target.files?.[0];
 
+
     if (!file) {
         return;
     }
+
 
     try {
 
         const text =
             await file.text();
 
+
         const imported =
             JSON.parse(text);
 
+
         if (!Array.isArray(imported)) {
-            throw new Error("Fichier JSON invalide.");
+
+            throw new Error(
+                "Fichier JSON invalide."
+            );
         }
 
-        for (const item of imported) {
+
+        for (
+            const item of imported
+        ) {
 
             const data = {
 
@@ -1601,53 +2142,73 @@ async function importData(event) {
                     item.parent_id || null,
 
                 name:
-                    item.name || "Sans nom",
+                    item.name ||
+                    "Sans nom",
 
                 type:
-                    item.type || "folder",
+                    item.type ||
+                    "folder",
 
                 color:
-                    item.color || "#315bd6",
+                    item.color ||
+                    "#315bd6",
 
                 text_content:
-                    item.text_content || null,
+                    item.text_content ||
+                    null,
 
                 image_url:
-                    item.image_url || null,
+                    item.image_url ||
+                    null,
 
                 audio_url:
-                    item.audio_url || null,
+                    item.audio_url ||
+                    null,
 
                 question:
-                    item.question || null,
+                    item.question ||
+                    null,
 
                 answer:
-                    item.answer || null
+                    item.answer ||
+                    null
             };
+
 
             const result =
                 await supabaseClient
                     .from("items")
                     .insert(data);
 
+
             if (result.error) {
-                console.error(result.error);
+
+                console.error(
+                    result.error
+                );
             }
         }
+
 
         await loadItems();
 
         renderAdmin();
 
-        alert("Import terminé.");
+
+        alert(
+            "Import terminé."
+        );
+
 
     } catch (error) {
 
         console.error(error);
 
+
         alert(
             "Impossible d'importer ce fichier."
         );
+
 
     } finally {
 
@@ -1663,11 +2224,26 @@ async function importData(event) {
 function escapeHTML(value) {
 
     return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
 
@@ -1681,31 +2257,72 @@ function escapeAttribute(value) {
    FONCTIONS UTILISÉES PAR index.html
 ========================================================= */
 
-window.showHome = showHome;
-window.showLearn = showLearn;
-window.showLogin = showLogin;
-window.showAdmin = showAdmin;
+window.showHome =
+    showHome;
 
-window.login = login;
-window.logout = logout;
+window.showLearn =
+    showLearn;
 
-window.newItem = newItem;
-window.saveItem = saveItem;
-window.closeEditor = closeEditor;
-window.changeType = changeType;
-window.updateColor = updateColor;
+window.showLogin =
+    showLogin;
 
-window.editItem = editItem;
-window.deleteItem = deleteItem;
-window.previewItem = previewItem;
+window.showAdmin =
+    showAdmin;
 
-window.openPublicItem = openPublicItem;
-window.openAdminFolder = openAdminFolder;
 
-window.goHomeExplorer = goHomeExplorer;
-window.adminGoHome = adminGoHome;
+window.login =
+    login;
 
-window.checkExercise = checkExercise;
+window.logout =
+    logout;
 
-window.exportData = exportData;
-window.importData = importData;
+
+window.newItem =
+    newItem;
+
+window.saveItem =
+    saveItem;
+
+window.closeEditor =
+    closeEditor;
+
+window.changeType =
+    changeType;
+
+window.updateColor =
+    updateColor;
+
+
+window.editItem =
+    editItem;
+
+window.deleteItem =
+    deleteItem;
+
+window.previewItem =
+    previewItem;
+
+
+window.openPublicItem =
+    openPublicItem;
+
+window.openAdminFolder =
+    openAdminFolder;
+
+
+window.goHomeExplorer =
+    goHomeExplorer;
+
+window.adminGoHome =
+    adminGoHome;
+
+
+window.checkExercise =
+    checkExercise;
+
+
+window.exportData =
+    exportData;
+
+window.importData =
+    importData;

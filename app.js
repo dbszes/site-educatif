@@ -1,4 +1,3 @@
-```javascript
 "use strict";
 
 /* =========================================================
@@ -11,11 +10,39 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_e9J4xKfdIbIM2STAI4lReQ_Ks-d8owd";
 
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+let supabaseClient = null;
+
+function initSupabase() {
+    try {
+        if (
+            window.supabase &&
+            typeof window.supabase.createClient === "function"
+        ) {
+            supabaseClient =
+                window.supabase.createClient(
+                    SUPABASE_URL,
+                    SUPABASE_KEY
+                );
+
+            return true;
+        }
+
+        console.error(
+            "La bibliothèque Supabase n'est pas chargée."
+        );
+
+        return false;
+
+    } catch (error) {
+
+        console.error(
+            "Impossible d'initialiser Supabase :",
+            error
+        );
+
+        return false;
+    }
+}
 
 
 /* =========================================================
@@ -46,7 +73,9 @@ let isAdmin = false;
 
 document.addEventListener(
     "DOMContentLoaded",
-    async () => {
+    async function () {
+
+        initSupabase();
 
         const savedAdmin =
             sessionStorage.getItem(
@@ -64,7 +93,6 @@ document.addEventListener(
         showHome();
 
         setupRealtime();
-
     }
 );
 
@@ -75,12 +103,14 @@ document.addEventListener(
 
 function hideAllSections() {
 
-    [
+    const sectionIds = [
         "home",
         "learn",
         "login",
         "admin"
-    ].forEach(id => {
+    ];
+
+    sectionIds.forEach(function (id) {
 
         const element =
             document.getElementById(id);
@@ -88,9 +118,7 @@ function hideAllSections() {
         if (element) {
             element.classList.add("hidden");
         }
-
     });
-
 }
 
 
@@ -110,7 +138,6 @@ function showHome() {
     currentFolder = null;
 
     renderHome();
-
 }
 
 
@@ -130,7 +157,6 @@ function showLearn() {
     currentFolder = null;
 
     renderLearn();
-
 }
 
 
@@ -146,7 +172,6 @@ function showLogin() {
     }
 
     setSiteTitle("Se connecter");
-
 }
 
 
@@ -173,21 +198,17 @@ function showAdmin() {
     closeEditor();
 
     renderAdmin();
-
 }
 
 
 function setSiteTitle(title) {
 
     const element =
-        document.getElementById(
-            "siteTitle"
-        );
+        document.getElementById("siteTitle");
 
     if (element) {
         element.textContent = title;
     }
-
 }
 
 
@@ -198,9 +219,7 @@ function setSiteTitle(title) {
 function updateInterface() {
 
     const adminButton =
-        document.getElementById(
-            "adminButton"
-        );
+        document.getElementById("adminButton");
 
     if (!adminButton) {
         return;
@@ -219,9 +238,7 @@ function updateInterface() {
     } else {
 
         adminButton.innerHTML = "";
-
     }
-
 }
 
 
@@ -231,22 +248,21 @@ function updateInterface() {
 
 async function login() {
 
+    const firstNameElement =
+        document.getElementById("firstName");
+
+    const lastNameElement =
+        document.getElementById("lastName");
+
     const firstName =
-        document
-            .getElementById("firstName")
-            ?.value
-            .trim();
+        firstNameElement
+            ? firstNameElement.value.trim()
+            : "";
 
     const lastName =
-        document
-            .getElementById("lastName")
-            ?.value
-            .trim();
-
-    const message =
-        document.getElementById(
-            "loginMessage"
-        );
+        lastNameElement
+            ? lastNameElement.value.trim()
+            : "";
 
     if (!firstName || !lastName) {
 
@@ -290,10 +306,9 @@ async function login() {
         true
     );
 
-    setTimeout(() => {
+    setTimeout(function () {
         showAdmin();
     }, 500);
-
 }
 
 
@@ -321,7 +336,6 @@ function showLoginMessage(
     message.classList.add(
         success ? "ok" : "no"
     );
-
 }
 
 
@@ -342,12 +356,11 @@ function logout() {
     updateInterface();
 
     showHome();
-
 }
 
 
 /* =========================================================
-   CHARGER LES DONNÉES
+   CHARGEMENT DES DONNÉES
 ========================================================= */
 
 async function loadItems() {
@@ -364,29 +377,41 @@ async function loadItems() {
                 Chargement...
             </div>
         `;
+    }
 
+    if (!supabaseClient) {
+
+        if (home) {
+
+            home.innerHTML = `
+                <div class="notice">
+                    Le service de données n'est pas disponible.
+                    La navigation du site reste disponible.
+                </div>
+            `;
+        }
+
+        return;
     }
 
     try {
 
-        const {
-            data,
-            error
-        } = await supabaseClient
-            .from("items")
-            .select("*")
-            .order(
-                "created_at",
-                {
-                    ascending: true
-                }
-            );
+        const result =
+            await supabaseClient
+                .from("items")
+                .select("*")
+                .order(
+                    "created_at",
+                    {
+                        ascending: true
+                    }
+                );
 
-        if (error) {
-            throw error;
+        if (result.error) {
+            throw result.error;
         }
 
-        items = data || [];
+        items = result.data || [];
 
         renderHome();
         renderLearn();
@@ -406,15 +431,12 @@ async function loadItems() {
 
             home.innerHTML = `
                 <div class="notice">
-                    Impossible de charger
-                    les données.
+                    Impossible de charger les données.
+                    Vérifie la connexion à Supabase.
                 </div>
             `;
-
         }
-
     }
-
 }
 
 
@@ -425,20 +447,20 @@ async function loadItems() {
 function getChildren(parentId) {
 
     return items.filter(
-        item =>
-            item.parent_id === parentId
+        function (item) {
+            return item.parent_id === parentId;
+        }
     );
-
 }
 
 
 function getItem(id) {
 
     return items.find(
-        item =>
-            item.id === id
+        function (item) {
+            return item.id === id;
+        }
     );
-
 }
 
 
@@ -459,11 +481,9 @@ function getPath(folderId) {
 
         current =
             getItem(current.parent_id);
-
     }
 
     return path;
-
 }
 
 
@@ -487,7 +507,6 @@ function getIcon(type) {
         default:
             return "📄";
     }
-
 }
 
 
@@ -531,35 +550,28 @@ function renderHome() {
     }
 
     container.innerHTML = `
-
         <div class="file-grid">
-
             ${roots
-                .map(
-                    item =>
-                        publicFileHTML(item)
-                )
+                .map(function (item) {
+                    return publicFileHTML(item);
+                })
                 .join("")}
-
         </div>
-
     `;
-
 }
 
 
 function publicFileHTML(item) {
 
     return `
-
         <div
             class="file"
             style="border-top:5px solid ${escapeAttribute(
                 item.color || "#315bd6"
             )}"
-            onclick="openPublicItem(
-                '${escapeAttribute(item.id)}'
-            )"
+            onclick="openPublicItem('${escapeAttribute(
+                item.id
+            )}')"
         >
 
             <div class="icon">
@@ -571,9 +583,7 @@ function publicFileHTML(item) {
             </div>
 
         </div>
-
     `;
-
 }
 
 
@@ -596,7 +606,6 @@ function openPublicItem(id) {
     }
 
     openPublicContent(item);
-
 }
 
 
@@ -637,24 +646,21 @@ function renderPublicFolder(
             </button>
 
             ${path
-                .map(
-                    folderItem => `
+                .map(function (folderItem) {
 
+                    return `
                         <span>›</span>
 
                         <button
-                            onclick="openPublicItem(
-                                '${escapeAttribute(
-                                    folderItem.id
-                                )}'
-                            )">
+                            onclick="openPublicItem('${escapeAttribute(
+                                folderItem.id
+                            )}')">
                             ${escapeHTML(
                                 folderItem.name
                             )}
                         </button>
-
-                    `
-                )
+                    `;
+                })
                 .join("")}
 
         </div>
@@ -665,23 +671,18 @@ function renderPublicFolder(
                     <div class="notice">
                         Ce dossier est vide.
                     </div>
-                  `
+                `
                 : `
                     <div class="file-grid">
                         ${children
-                            .map(
-                                item =>
-                                    publicFileHTML(
-                                        item
-                                    )
-                            )
+                            .map(function (item) {
+                                return publicFileHTML(item);
+                            })
                             .join("")}
                     </div>
-                  `
+                `
         }
-
     `;
-
 }
 
 
@@ -690,7 +691,6 @@ function goHomeExplorer() {
     currentFolder = null;
 
     renderHome();
-
 }
 
 
@@ -724,24 +724,21 @@ function openPublicContent(item) {
             </button>
 
             ${path
-                .map(
-                    folder => `
+                .map(function (folder) {
 
+                    return `
                         <span>›</span>
 
                         <button
-                            onclick="openPublicItem(
-                                '${escapeAttribute(
-                                    folder.id
-                                )}'
-                            )">
+                            onclick="openPublicItem('${escapeAttribute(
+                                folder.id
+                            )}')">
                             ${escapeHTML(
                                 folder.name
                             )}
                         </button>
-
-                    `
-                )
+                    `;
+                })
                 .join("")}
 
             <span>›</span>
@@ -751,7 +748,6 @@ function openPublicContent(item) {
             </strong>
 
         </div>
-
     `;
 
 
@@ -773,7 +769,7 @@ function openPublicContent(item) {
                                     item.text_content
                                 )}
                             </p>
-                          `
+                        `
                         : ""
                 }
 
@@ -786,7 +782,7 @@ function openPublicContent(item) {
                                 )}"
                                 alt=""
                             >
-                          `
+                        `
                         : ""
                 }
 
@@ -799,14 +795,12 @@ function openPublicContent(item) {
                                     item.audio_url
                                 )}">
                             </audio>
-                          `
+                        `
                         : ""
                 }
 
             </article>
-
         `;
-
     }
 
 
@@ -833,9 +827,9 @@ function openPublicContent(item) {
                 >
 
                 <button
-                    onclick="checkExercise(
-                        '${escapeAttribute(item.id)}'
-                    )">
+                    onclick="checkExercise('${escapeAttribute(
+                        item.id
+                    )}')">
                     Vérifier
                 </button>
 
@@ -845,13 +839,10 @@ function openPublicContent(item) {
                 </div>
 
             </div>
-
         `;
-
     }
 
     container.innerHTML = html;
-
 }
 
 
@@ -914,9 +905,7 @@ function checkExercise(id) {
 
         result.textContent =
             "❌ Ce n'est pas la bonne réponse.";
-
     }
-
 }
 
 
@@ -930,7 +919,6 @@ function normalizeAnswer(value) {
             /[\u0300-\u036f]/g,
             ""
         );
-
 }
 
 
@@ -964,20 +952,16 @@ function renderLearn() {
     }
 
     container.innerHTML = `
-
         <div class="file-grid">
 
             ${roots
-                .map(
-                    item =>
-                        publicFileHTML(item)
-                )
+                .map(function (item) {
+                    return publicFileHTML(item);
+                })
                 .join("")}
 
         </div>
-
     `;
-
 }
 
 
@@ -1023,24 +1007,21 @@ function renderAdmin() {
             </button>
 
             ${path
-                .map(
-                    folder => `
+                .map(function (folder) {
 
+                    return `
                         <span>›</span>
 
                         <button
-                            onclick="openAdminFolder(
-                                '${escapeAttribute(
-                                    folder.id
-                                )}'
-                            )">
+                            onclick="openAdminFolder('${escapeAttribute(
+                                folder.id
+                            )}')">
                             ${escapeHTML(
                                 folder.name
                             )}
                         </button>
-
-                    `
-                )
+                    `;
+                })
                 .join("")}
 
         </div>
@@ -1055,19 +1036,14 @@ function renderAdmin() {
                     <div class="notice">
                         Ce dossier est vide.
                     </div>
-                  `
+                `
                 : children
-                    .map(
-                        item =>
-                            adminItemHTML(
-                                item
-                            )
-                    )
+                    .map(function (item) {
+                        return adminItemHTML(item);
+                    })
                     .join("")
         }
-
     `;
-
 }
 
 
@@ -1095,7 +1071,6 @@ function adminItemHTML(item) {
                         : item.type === "memo"
                             ? "Mémo"
                             : "Exercice"
-
                 }
 
             </small>
@@ -1106,52 +1081,42 @@ function adminItemHTML(item) {
                     item.type === "folder"
                         ? `
                             <button
-                                onclick="openAdminFolder(
-                                    '${escapeAttribute(
-                                        item.id
-                                    )}'
-                                )">
+                                onclick="openAdminFolder('${escapeAttribute(
+                                    item.id
+                                )}')">
                                 Ouvrir
                             </button>
-                          `
+                        `
                         : `
                             <button
-                                onclick="previewItem(
-                                    '${escapeAttribute(
-                                        item.id
-                                    )}'
-                                )">
+                                onclick="previewItem('${escapeAttribute(
+                                    item.id
+                                )}')">
                                 Voir
                             </button>
-                          `
+                        `
                 }
 
                 <button
                     class="secondary"
-                    onclick="editItem(
-                        '${escapeAttribute(
-                            item.id
-                        )}'
-                    )">
+                    onclick="editItem('${escapeAttribute(
+                        item.id
+                    )}')">
                     Modifier
                 </button>
 
                 <button
                     class="danger"
-                    onclick="deleteItem(
-                        '${escapeAttribute(
-                            item.id
-                        )}'
-                    )">
+                    onclick="deleteItem('${escapeAttribute(
+                        item.id
+                    )}')">
                     Supprimer
                 </button>
 
             </div>
 
         </div>
-
     `;
-
 }
 
 
@@ -1166,7 +1131,6 @@ function adminGoHome() {
     closeEditor();
 
     renderAdmin();
-
 }
 
 
@@ -1179,7 +1143,10 @@ function openAdminFolder(id) {
     const item =
         getItem(id);
 
-    if (!item || item.type !== "folder") {
+    if (
+        !item ||
+        item.type !== "folder"
+    ) {
         return;
     }
 
@@ -1188,7 +1155,6 @@ function openAdminFolder(id) {
     closeEditor();
 
     renderAdmin();
-
 }
 
 
@@ -1206,19 +1172,31 @@ function newItem(parentId = null) {
     }
 
     currentFolder =
-        parentId ?? currentFolder;
+        parentId !== null
+            ? parentId
+            : currentFolder;
 
     clearEditor();
 
-    document
-        .getElementById("editParent")
-        .value =
-            currentFolder || "";
+    const editParent =
+        document.getElementById(
+            "editParent"
+        );
 
-    document
-        .getElementById("editorTitle")
-        .textContent =
+    if (editParent) {
+        editParent.value =
+            currentFolder || "";
+    }
+
+    const editorTitle =
+        document.getElementById(
+            "editorTitle"
+        );
+
+    if (editorTitle) {
+        editorTitle.textContent =
             "Nouveau fichier";
+    }
 
     const editor =
         document.getElementById(
@@ -1226,19 +1204,19 @@ function newItem(parentId = null) {
         );
 
     if (editor) {
+
         editor.classList.remove(
             "hidden"
         );
+
+        changeType();
+
+        updateColor();
+
+        editor.scrollIntoView({
+            behavior: "smooth"
+        });
     }
-
-    changeType();
-
-    updateColor();
-
-    editor?.scrollIntoView({
-        behavior: "smooth"
-    });
-
 }
 
 
@@ -1259,59 +1237,65 @@ function editItem(id) {
         return;
     }
 
-    document
-        .getElementById("editId")
-        .value = item.id;
+    setInputValue(
+        "editId",
+        item.id
+    );
 
-    document
-        .getElementById("editParent")
-        .value =
-            item.parent_id || "";
+    setInputValue(
+        "editParent",
+        item.parent_id || ""
+    );
 
-    document
-        .getElementById("itemName")
-        .value =
-            item.name || "";
+    setInputValue(
+        "itemName",
+        item.name || ""
+    );
 
-    document
-        .getElementById("itemType")
-        .value =
-            item.type || "folder";
+    setInputValue(
+        "itemType",
+        item.type || "folder"
+    );
 
-    document
-        .getElementById("itemColor")
-        .value =
-            item.color || "#315bd6";
+    setInputValue(
+        "itemColor",
+        item.color || "#315bd6"
+    );
 
-    document
-        .getElementById("itemText")
-        .value =
-            item.text_content || "";
+    setInputValue(
+        "itemText",
+        item.text_content || ""
+    );
 
-    document
-        .getElementById("itemImageUrl")
-        .value =
-            item.image_url || "";
+    setInputValue(
+        "itemImageUrl",
+        item.image_url || ""
+    );
 
-    document
-        .getElementById("itemAudioUrl")
-        .value =
-            item.audio_url || "";
+    setInputValue(
+        "itemAudioUrl",
+        item.audio_url || ""
+    );
 
-    document
-        .getElementById("question")
-        .value =
-            item.question || "";
+    setInputValue(
+        "question",
+        item.question || ""
+    );
 
-    document
-        .getElementById("answer")
-        .value =
-            item.answer || "";
+    setInputValue(
+        "answer",
+        item.answer || ""
+    );
 
-    document
-        .getElementById("editorTitle")
-        .textContent =
+    const editorTitle =
+        document.getElementById(
+            "editorTitle"
+        );
+
+    if (editorTitle) {
+        editorTitle.textContent =
             "Modifier";
+    }
 
     const editor =
         document.getElementById(
@@ -1319,19 +1303,33 @@ function editItem(id) {
         );
 
     if (editor) {
+
         editor.classList.remove(
             "hidden"
         );
+
+        changeType();
+
+        updateColor();
+
+        editor.scrollIntoView({
+            behavior: "smooth"
+        });
     }
+}
 
-    changeType();
 
-    updateColor();
+function setInputValue(
+    id,
+    value
+) {
 
-    editor?.scrollIntoView({
-        behavior: "smooth"
-    });
+    const element =
+        document.getElementById(id);
 
+    if (element) {
+        element.value = value;
+    }
 }
 
 
@@ -1352,7 +1350,7 @@ function clearEditor() {
         "answer"
     ];
 
-    fields.forEach(id => {
+    fields.forEach(function (id) {
 
         const element =
             document.getElementById(id);
@@ -1360,7 +1358,6 @@ function clearEditor() {
         if (element) {
             element.value = "";
         }
-
     });
 
     const type =
@@ -1398,7 +1395,6 @@ function clearEditor() {
     if (audioFile) {
         audioFile.value = "";
     }
-
 }
 
 
@@ -1414,7 +1410,6 @@ function closeEditor() {
             "hidden"
         );
     }
-
 }
 
 
@@ -1441,7 +1436,6 @@ function changeType() {
             "hidden",
             type !== "memo"
         );
-
     }
 
     if (exerciseFields) {
@@ -1450,9 +1444,7 @@ function changeType() {
             "hidden",
             type !== "exercise"
         );
-
     }
-
 }
 
 
@@ -1473,7 +1465,6 @@ function updateColor() {
         preview.style.background =
             color;
     }
-
 }
 
 
@@ -1486,6 +1477,15 @@ async function saveItem() {
     if (!isAdmin) {
 
         showLogin();
+
+        return;
+    }
+
+    if (!supabaseClient) {
+
+        alert(
+            "Supabase n'est pas disponible."
+        );
 
         return;
     }
@@ -1545,64 +1545,48 @@ async function saveItem() {
 
     const data = {
 
-        name,
+        name: name,
 
-        type,
+        type: type,
 
-        color,
+        color: color,
 
-        parent_id:
-            type === "folder"
-                ? parentId
-                : parentId,
+        parent_id: parentId,
 
         text_content:
             type === "memo"
-                ? document
-                    .getElementById(
-                        "itemText"
-                    )
-                    ?.value || null
+                ? getInputValue(
+                    "itemText"
+                ) || null
                 : null,
 
         image_url:
             type === "memo"
-                ? document
-                    .getElementById(
-                        "itemImageUrl"
-                    )
-                    ?.value
-                    .trim() || null
+                ? getInputValue(
+                    "itemImageUrl"
+                ) || null
                 : null,
 
         audio_url:
             type === "memo"
-                ? document
-                    .getElementById(
-                        "itemAudioUrl"
-                    )
-                    ?.value
-                    .trim() || null
+                ? getInputValue(
+                    "itemAudioUrl"
+                ) || null
                 : null,
 
         question:
             type === "exercise"
-                ? document
-                    .getElementById(
-                        "question"
-                    )
-                    ?.value || null
+                ? getInputValue(
+                    "question"
+                ) || null
                 : null,
 
         answer:
             type === "exercise"
-                ? document
-                    .getElementById(
-                        "answer"
-                    )
-                    ?.value || null
+                ? getInputValue(
+                    "answer"
+                ) || null
                 : null
-
     };
 
 
@@ -1628,7 +1612,6 @@ async function saveItem() {
                     .insert(data)
                     .select()
                     .single();
-
         }
 
         if (result.error) {
@@ -1656,9 +1639,18 @@ async function saveItem() {
             "Impossible d'enregistrer.\n\n" +
             error.message
         );
-
     }
+}
 
+
+function getInputValue(id) {
+
+    const element =
+        document.getElementById(id);
+
+    return element
+        ? element.value
+        : "";
 }
 
 
@@ -1669,6 +1661,15 @@ async function saveItem() {
 async function deleteItem(id) {
 
     if (!isAdmin) {
+        return;
+    }
+
+    if (!supabaseClient) {
+
+        alert(
+            "Supabase n'est pas disponible."
+        );
+
         return;
     }
 
@@ -1692,15 +1693,14 @@ async function deleteItem(id) {
 
     try {
 
-        const {
-            error
-        } = await supabaseClient
-            .from("items")
-            .delete()
-            .eq("id", id);
+        const result =
+            await supabaseClient
+                .from("items")
+                .delete()
+                .eq("id", id);
 
-        if (error) {
-            throw error;
+        if (result.error) {
+            throw result.error;
         }
 
         if (currentFolder === id) {
@@ -1722,9 +1722,7 @@ async function deleteItem(id) {
             "Impossible de supprimer.\n\n" +
             error.message
         );
-
     }
-
 }
 
 
@@ -1746,12 +1744,11 @@ function previewItem(id) {
 
     showHome();
 
-    setTimeout(() => {
+    setTimeout(function () {
 
         openPublicContent(item);
 
     }, 50);
-
 }
 
 
@@ -1761,25 +1758,35 @@ function previewItem(id) {
 
 function setupRealtime() {
 
-    supabaseClient
-        .channel(
-            "items-realtime"
-        )
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "items"
-            },
-            async () => {
+    if (!supabaseClient) {
+        return;
+    }
 
-                await loadItems();
+    try {
 
-            }
-        )
-        .subscribe();
+        supabaseClient
+            .channel("items-realtime")
+            .on(
+                "postgres_changes",
+                {
+                    event: "*",
+                    schema: "public",
+                    table: "items"
+                },
+                async function () {
 
+                    await loadItems();
+                }
+            )
+            .subscribe();
+
+    } catch (error) {
+
+        console.error(
+            "Erreur Realtime :",
+            error
+        );
+    }
 }
 
 
@@ -1827,7 +1834,6 @@ function exportData() {
     link.remove();
 
     URL.revokeObjectURL(url);
-
 }
 
 
@@ -1838,6 +1844,15 @@ function exportData() {
 async function importData(event) {
 
     if (!isAdmin) {
+        return;
+    }
+
+    if (!supabaseClient) {
+
+        alert(
+            "Supabase n'est pas disponible."
+        );
+
         return;
     }
 
@@ -1861,7 +1876,6 @@ async function importData(event) {
             throw new Error(
                 "Le fichier JSON est invalide."
             );
-
         }
 
         const confirmation =
@@ -1880,9 +1894,6 @@ async function importData(event) {
         ) {
 
             const data = {
-
-                id:
-                    item.id || undefined,
 
                 parent_id:
                     item.parent_id || null,
@@ -1910,24 +1921,20 @@ async function importData(event) {
 
                 answer:
                     item.answer || null
-
             };
 
-            delete data.id;
+            const result =
+                await supabaseClient
+                    .from("items")
+                    .insert(data);
 
-            const {
-                error
-            } = await supabaseClient
-                .from("items")
-                .insert(data);
+            if (result.error) {
 
-            if (error) {
                 console.error(
                     "Erreur import :",
-                    error
+                    result.error
                 );
             }
-
         }
 
         await loadItems();
@@ -1949,10 +1956,10 @@ async function importData(event) {
             "Impossible d'importer ce fichier."
         );
 
+    } finally {
+
+        event.target.value = "";
     }
-
-    event.target.value = "";
-
 }
 
 
@@ -1983,13 +1990,50 @@ function escapeHTML(value) {
             /'/g,
             "&#039;"
         );
-
 }
 
 
 function escapeAttribute(value) {
 
     return escapeHTML(value);
-
 }
-```
+
+
+/* =========================================================
+   EXPOSER LES FONCTIONS AU HTML
+========================================================= */
+
+/*
+   Les boutons de index.html utilisent onclick="..."
+   On rend donc explicitement les fonctions accessibles
+   depuis le HTML.
+*/
+
+window.showHome = showHome;
+window.showLearn = showLearn;
+window.showLogin = showLogin;
+window.showAdmin = showAdmin;
+
+window.login = login;
+window.logout = logout;
+
+window.newItem = newItem;
+window.saveItem = saveItem;
+window.closeEditor = closeEditor;
+window.changeType = changeType;
+window.updateColor = updateColor;
+
+window.editItem = editItem;
+window.deleteItem = deleteItem;
+window.previewItem = previewItem;
+
+window.openPublicItem = openPublicItem;
+window.openAdminFolder = openAdminFolder;
+
+window.goHomeExplorer = goHomeExplorer;
+window.adminGoHome = adminGoHome;
+
+window.checkExercise = checkExercise;
+
+window.exportData = exportData;
+window.importData = importData;

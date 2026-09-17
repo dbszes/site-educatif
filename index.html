@@ -1,364 +1,388 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- =========================
+     EDITEUR
+========================== -->
 
-    <title>Accueil</title>
+<div id="editor" class="card hidden">
 
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <!-- Style du site -->
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<header class="site-header">
-
-    <div class="header-left">
-        <h1 id="siteTitle">Accueil</h1>
-    </div>
-
-    <nav class="main-nav">
-
-        <button
-            class="nav-button secondary"
-            onclick="showHome()">
-            Accueil
-        </button>
-
-        <button
-            class="nav-button secondary"
-            onclick="showLearn()">
-            Apprendre
-        </button>
-
-        <button
-            class="nav-button secondary"
-            onclick="showLogin()">
-            Se connecter
-        </button>
-
-        <span id="adminButton"></span>
-
-    </nav>
-
-</header>
-
-
-<main>
-
-    <!-- =========================
-         ACCUEIL
-    ========================== -->
-
-    <section id="home">
-
-        <div class="card">
-
-            <h2>Accueil</h2>
-
-            <p class="muted">
-                Explore les matières, les dossiers,
-                les mémos et les exercices.
-            </p>
-
-            <div id="homeExplorer">
-                <div class="notice">
-                    Chargement...
-                </div>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         APPRENDRE
-    ========================== -->
-
-    <section id="learn" class="hidden">
-
-        <div class="card">
-
-            <h2>Apprendre</h2>
-
-            <p class="muted">
-                Crée et organise les matières
-                et les ressources.
-            </p>
-
-            <div id="learnExplorer">
-                <div class="notice">
-                    Chargement...
-                </div>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         CONNEXION
-    ========================== -->
-
-    <section id="login" class="hidden">
-
-        <div class="card login-card">
-
-            <h2>Se connecter</h2>
-
-            <p class="muted">
-                Connecte-toi pour accéder
-                à l'administration.
-            </p>
-
-            <label for="firstName">
-                Prénom
-            </label>
-
-            <input
-                id="firstName"
-                type="text"
-                autocomplete="given-name"
-            >
-
-            <label for="lastName">
-                Nom de famille
-            </label>
-
-            <input
-                id="lastName"
-                type="text"
-                autocomplete="family-name"
-            >
-
-            <button onclick="login()">
-                Se connecter
-            </button>
-
-            <p id="loginMessage"></p>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         ADMINISTRATION
-    ========================== -->
-
-    <section id="admin" class="hidden">
-
-        <div class="card">
-
-            <div class="toolbar">
-
-                <button onclick="newItem(currentFolder)">
-                    + Nouveau fichier
-                </button>
-
-                <button
-                    class="secondary"
-                    onclick="logout()">
-                    Déconnexion
-                </button>
-
-            </div>
-
-            <div id="adminExplorer">
-
-                <div class="notice">
-                    Chargement...
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =========================
-             EDITEUR
-        ========================== -->
-
-        <div id="editor" class="card hidden">
+    <div class="editor-header">
+        <div>
+            <span class="eyebrow">ÉDITION</span>
 
             <h2 id="editorTitle">
-                Nouveau fichier
+                Nouveau contenu
             </h2>
 
-            <input
-                type="hidden"
-                id="editId"
-            >
+            <p class="muted">
+                Crée et configure ta ressource.
+            </p>
+        </div>
 
-            <input
-                type="hidden"
-                id="editParent"
-            >
-
-
-            <div class="grid">
-
-                <div>
-
-                    <label for="itemName">
-                        Nom
-                    </label>
-
-                    <input
-                        id="itemName"
-                        placeholder="Nom du fichier ou dossier"
-                    >
+        <button
+            class="secondary"
+            type="button"
+            onclick="closeEditor()">
+            Fermer
+        </button>
+    </div>
 
 
-                    <label for="itemType">
-                        Type
-                    </label>
+    <input
+        type="hidden"
+        id="editId"
+    >
 
-                    <select
-                        id="itemType"
-                        onchange="changeType()">
-
-                        <option value="folder">
-                            📁 Dossier
-                        </option>
-
-                        <option value="memo">
-                            📄 Mémo
-                        </option>
-
-                        <option value="exercise">
-                            📝 Exercice
-                        </option>
-
-                    </select>
+    <input
+        type="hidden"
+        id="editParent"
+    >
 
 
-                    <label for="itemColor">
-                        Couleur
-                    </label>
+    <!-- =========================
+         INFORMATIONS GENERALES
+    ========================== -->
 
-                    <input
-                        id="itemColor"
-                        type="color"
-                        value="#315bd6"
-                        oninput="updateColor()"
-                    >
+    <div class="editor-section">
 
-                    <div
-                        id="colorPreview"
-                        class="color-preview">
-                    </div>
+        <h3>Informations générales</h3>
 
-                </div>
+        <div class="grid">
 
+            <div>
 
-                <!-- =========================
-                     MEMO
-                ========================== -->
-
-                <div id="memoFields">
-
-                    <label for="itemText">
-                        Texte
-                    </label>
-
-                    <textarea
-                        id="itemText"
-                        placeholder="Écris ton mémo..."></textarea>
-
-
-                    <label for="itemImageUrl">
-                        Lien vers une image
-                    </label>
-
-                    <input
-                        id="itemImageUrl"
-                        placeholder="https://..."
-                    >
-
-
-                    <label for="itemImageFile">
-                        Image
-                    </label>
-
-                    <input
-                        id="itemImageFile"
-                        type="file"
-                        accept="image/*"
-                    >
-
-
-                    <label for="itemAudioUrl">
-                        Lien vers un son
-                    </label>
-
-                    <input
-                        id="itemAudioUrl"
-                        placeholder="https://..."
-                    >
-
-
-                    <label for="itemAudioFile">
-                        Son / MP3
-                    </label>
-
-                    <input
-                        id="itemAudioFile"
-                        type="file"
-                        accept="audio/*"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================
-                 EXERCICE
-            ========================== -->
-
-            <div
-                id="exerciseFields"
-                class="hidden">
-
-                <label for="question">
-                    Question
-                </label>
-
-                <textarea
-                    id="question"
-                    placeholder="Écris la question..."></textarea>
-
-
-                <label for="answer">
-                    Réponse attendue
+                <label for="itemName">
+                    Nom
                 </label>
 
                 <input
-                    id="answer"
-                    placeholder="Réponse"
+                    id="itemName"
+                    type="text"
+                    placeholder="Nom du contenu"
                 >
 
             </div>
 
 
-            <div class="toolbar">
+            <div>
 
-                <button onclick="saveItem()">
-                    Enregistrer
-                </button>
+                <label for="itemType">
+                    Type
+                </label>
+
+                <select
+                    id="itemType"
+                    onchange="changeType()">
+
+                    <option value="folder">
+                        📁 Dossier
+                    </option>
+
+                    <option value="memo">
+                        📄 Mémo
+                    </option>
+
+                    <option value="exercise">
+                        📝 Exercice
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <label for="itemColor">
+            Couleur
+        </label>
+
+        <div class="color-row">
+
+            <input
+                id="itemColor"
+                type="color"
+                value="#315bd6"
+                oninput="updateColor()"
+            >
+
+            <div
+                id="colorPreview"
+                class="color-preview">
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         MEMO
+    ========================== -->
+
+    <div
+        id="memoFields"
+        class="editor-section">
+
+        <h3>Contenu du mémo</h3>
+
+
+        <!-- Barre d'outils -->
+
+        <div class="rich-toolbar">
+
+            <button
+                type="button"
+                onclick="formatMemo('bold')"
+                title="Gras">
+                <strong>B</strong>
+            </button>
+
+            <button
+                type="button"
+                onclick="formatMemo('italic')"
+                title="Italique">
+                <em>I</em>
+            </button>
+
+            <button
+                type="button"
+                onclick="formatMemo('underline')"
+                title="Souligné">
+                <u>U</u>
+            </button>
+
+            <button
+                type="button"
+                onclick="formatMemo('insertUnorderedList')"
+                title="Liste">
+                • Liste
+            </button>
+
+            <button
+                type="button"
+                onclick="formatMemo('insertOrderedList')"
+                title="Liste numérotée">
+                1. Liste
+            </button>
+
+            <button
+                type="button"
+                onclick="addMemoLink()"
+                title="Lien">
+                🔗
+            </button>
+
+        </div>
+
+
+        <div
+            id="memoEditor"
+            class="rich-editor"
+            contenteditable="true"
+            data-placeholder="Écris ton mémo ici...">
+        </div>
+
+
+        <!-- IMAGE -->
+
+        <div class="media-box">
+
+            <div>
+                <h4>🖼️ Image</h4>
+
+                <p class="muted">
+                    Ajoute une image depuis ton ordinateur
+                    ou indique son URL.
+                </p>
+            </div>
+
+            <input
+                id="itemImageFile"
+                type="file"
+                accept="image/*"
+            >
+
+            <input
+                id="itemImageUrl"
+                type="url"
+                placeholder="https://exemple.com/image.jpg"
+            >
+
+        </div>
+
+
+        <!-- AUDIO -->
+
+        <div class="media-box">
+
+            <div>
+                <h4>🔊 Son / audio</h4>
+
+                <p class="muted">
+                    Ajoute un fichier audio ou un lien.
+                </p>
+            </div>
+
+            <input
+                id="itemAudioFile"
+                type="file"
+                accept="audio/*"
+            >
+
+            <input
+                id="itemAudioUrl"
+                type="url"
+                placeholder="https://exemple.com/audio.mp3"
+            >
+
+        </div>
+
+
+        <!-- YOUTUBE -->
+
+        <div class="media-box">
+
+            <div>
+                <h4>▶️ Vidéo YouTube</h4>
+
+                <p class="muted">
+                    Colle simplement le lien de la vidéo.
+                </p>
+            </div>
+
+            <input
+                id="itemYoutubeUrl"
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         EXERCICE
+    ========================== -->
+
+    <div
+        id="exerciseFields"
+        class="editor-section hidden">
+
+        <h3>Configuration de l'exercice</h3>
+
+
+        <!-- TYPE D'EXERCICE -->
+
+        <label for="exerciseType">
+            Type d'exercice
+        </label>
+
+        <select
+            id="exerciseType"
+            onchange="changeExerciseType()">
+
+            <option value="short_answer">
+                ✏️ Réponse précise
+            </option>
+
+            <option value="qcm">
+                ☑️ QCM
+            </option>
+
+            <option value="true_false">
+                ⚖️ Vrai / Faux
+            </option>
+
+            <option value="fill_blank">
+                🧩 Texte à trous
+            </option>
+
+            <option value="multiple_answer">
+                ☑️ Plusieurs réponses
+            </option>
+
+        </select>
+
+
+        <!-- QUESTION -->
+
+        <label for="question">
+            Question
+        </label>
+
+        <textarea
+            id="question"
+            placeholder="Écris la question...">
+        </textarea>
+
+
+        <!-- =========================
+             REPONSE PRECISE
+        ========================== -->
+
+        <div id="shortAnswerFields">
+
+            <label for="answer">
+                Réponse attendue
+            </label>
+
+            <input
+                id="answer"
+                type="text"
+                placeholder="Réponse exacte"
+            >
+
+            <p class="field-help">
+                Tu peux choisir si la casse doit être respectée
+                ou non lors de la correction.
+            </p>
+
+            <label class="checkbox-row">
+
+                <input
+                    id="caseSensitive"
+                    type="checkbox"
+                >
+
+                Respecter les majuscules/minuscules
+
+            </label>
+
+        </div>
+
+
+        <!-- =========================
+             QCM
+        ========================== -->
+
+        <div
+            id="qcmFields"
+            class="hidden">
+
+            <div class="exercise-subheader">
+
+                <div>
+                    <h4>Propositions</h4>
+
+                    <p class="muted">
+                        Ajoute les réponses proposées.
+                    </p>
+                </div>
 
                 <button
+                    type="button"
                     class="secondary"
-                    onclick="closeEditor()">
-                    Annuler
+                    onclick="addChoice()">
+                    + Ajouter une proposition
                 </button>
+
+            </div>
+
+
+            <div id="choicesContainer">
+
+                <!-- Les propositions seront ajoutées
+                     dynamiquement par JavaScript -->
 
             </div>
 
@@ -366,52 +390,99 @@
 
 
         <!-- =========================
-             SAUVEGARDE
+             VRAI / FAUX
         ========================== -->
 
-        <div class="card">
+        <div
+            id="trueFalseFields"
+            class="hidden">
 
-            <h3>Sauvegarde</h3>
+            <label for="trueFalseAnswer">
+                Bonne réponse
+            </label>
 
-            <p class="muted">
-                Les données principales sont enregistrées
-                en ligne avec Supabase.
-            </p>
+            <select id="trueFalseAnswer">
 
-            <div class="toolbar">
+                <option value="true">
+                    Vrai
+                </option>
 
-                <button
-                    class="secondary"
-                    onclick="exportData()">
-                    Exporter
-                </button>
+                <option value="false">
+                    Faux
+                </option>
 
-                <button
-                    class="secondary"
-                    onclick="document.getElementById('importFile').click()">
-                    Importer
-                </button>
-
-            </div>
-
-
-            <input
-                id="importFile"
-                class="hidden"
-                type="file"
-                accept=".json"
-                onchange="importData(event)"
-            >
+            </select>
 
         </div>
 
-    </section>
 
-</main>
+        <!-- =========================
+             TEXTE A TROUS
+        ========================== -->
+
+        <div
+            id="fillBlankFields"
+            class="hidden">
+
+            <label for="fillBlankText">
+                Texte avec trous
+            </label>
+
+            <textarea
+                id="fillBlankText"
+                placeholder="La capitale de la France est {{Paris}}.">
+            </textarea>
+
+            <p class="field-help">
+                Utilise <strong>{{réponse}}</strong>
+                pour définir une réponse attendue.
+            </p>
+
+        </div>
 
 
-<!-- JavaScript du site -->
-<script src="app.js"></script>
+        <!-- =========================
+             EXPLICATION
+        ========================== -->
 
-</body>
-</html>
+        <div class="correction-box">
+
+            <h4>💡 Correction / explication</h4>
+
+            <textarea
+                id="exerciseExplanation"
+                placeholder="Explique la correction après la réponse...">
+            </textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         ACTIONS
+    ========================== -->
+
+    <div class="toolbar editor-actions">
+
+        <button
+            type="button"
+            onclick="saveItem()">
+
+            Enregistrer
+
+        </button>
+
+
+        <button
+            type="button"
+            class="secondary"
+            onclick="closeEditor()">
+
+            Annuler
+
+        </button>
+
+    </div>
+
+</div>
